@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{base :: head}"></th:block>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body>
+
+    <aside th:replace="~{base :: admin-sidebar(page='users')}"></aside>
+
+    <main class="main-content">
+        <h1>User Management</h1>
+
+        <div class="filter-bar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="customSearch" placeholder="Search users...">
+            </div>
+
+            <select class="filter-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Banned">Banned</option>
+            </select>
+
+            <select class="filter-select" id="planFilter">
+                <option value="">All Plans</option>
+                <option value="Free">Free</option>
+                <option value="Pro">Pro</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>User Details</th>
+                        <th>Role</th>
+                        <th>Joined Date</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-sm" style="background: var(--primary);">JD</div>
+                                <div class="user-info"><span>John Doe</span><span
+                                        class="user-email">john@example.com</span></div>
+                            </div>
+                        </td>
+                        <td>User</td>
+                        <td>Dec 10, 2024</td>
+                        <td><span class="badge bg-pro">Pro</span></td>
+                        <td><span class="badge bg-active">Active</span></td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn block" title="Block User"><svg width="16" height="16"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                    </svg></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div th:replace="~{base :: scripts}"></div>
+
+    <script>
+        $(document).ready(function () {
+            var table = $('#usersTable').DataTable({ "dom": 'rtip', "pageLength": 10, "ordering": true });
+            $('#customSearch').on('keyup', function () { table.search(this.value).draw(); });
+            $('#statusFilter').on('change', function () { table.column(4).search(this.value).draw(); });
+            $('#planFilter').on('change', function () { table.column(3).search(this.value).draw(); });
+        });
+    </script>
+
+</body>
+
+</html>

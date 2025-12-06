@@ -1,0 +1,90 @@
+  /* --- THEME SETTINGS --- */
+  :root {
+      --bg-dark: #0B0E14;
+      --primary: #8b5cf6;
+      --accent: #38bdf8;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --card-bg: rgba(255, 255, 255, 0.05);
+  }
+
+  * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+  }
+
+  body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+      overflow: hidden;
+      position: relative;
+  }
+
+  /* --- GLOBAL LOADER (MODERN ROUNDED SPINNER) --- */
+  .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 14, 20, 0.8);
+      /* Dark transparent bg */
+      backdrop-filter: blur(8px);
+      /* Stronger blur for glass effect */
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+  }
+
+  /* ROUNDED GRADIENT SPINNER */
+  .spinner {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      /* The trick for the gradient border */
+      background: conic-gradient(#0000 10%, var(--primary), var(--accent));
+      /* Mask to carve out the center */
+      -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+      animation: spin 1.2s infinite linear;
+  }
+
+  .loading-text {
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      /* Optional: Add a soft glow */
+      text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      animation: pulse 2s infinite ease-in-out;
+  }
+
+  @keyframes spin {
+      to {
+          transform: rotate(1turn);
+      }
+  }
+
+  @keyframes pulse {
+
+      0%,
+      100% {
+          opacity: 0.7;
+      }
+
+      50% {
+          opacity: 1;
+      }
+  }

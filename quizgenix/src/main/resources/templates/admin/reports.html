@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{base :: head}"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <aside th:replace="~{base :: admin-sidebar(page='reports')}"></aside>
+
+    <main class="main-content">
+        <h1>System Reports</h1>
+
+        <div class="report-toolbar"
+            style="display: flex; gap: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;">
+            <input type="date" class="difficulty-select">
+            <input type="date" class="difficulty-select">
+            <button class="btn-generate" style="padding: 0.5rem 1.5rem;">Export CSV</button>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>System Traffic Analysis</h3>
+            </div>
+            <div class="chart-box"><canvas id="reportChart"></canvas></div>
+        </div>
+
+        <div class="table-container" style="margin-top: 2rem;">
+            <h3>System Logs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Backup</td>
+                        <td>Database Backup</td>
+                        <td>Dec 16, 02:00 AM</td>
+                        <td>Success</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div th:replace="~{base :: scripts}"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('reportChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [12000, 15000, 11000, 22000],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
