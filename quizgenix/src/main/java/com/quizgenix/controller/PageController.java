@@ -1,6 +1,9 @@
-package com.quizgenix.controller; // Make sure this package line is correct!
+package com.quizgenix.controller;
+
+import java.security.Principal; // Import Principal
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model; // Import Model
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
@@ -8,7 +11,7 @@ public class PageController {
 
     @GetMapping("/")
     public String home() {
-        return "index"; // This loads index.html
+        return "index";
     }
 
     // @GetMapping("/login")
@@ -46,10 +49,18 @@ public class PageController {
         return "settings";
     }
 
+    /* --- UPDATED METHOD --- */
     @GetMapping("/pricing")
-    public String pricing() {
+    public String pricing(Model model, Principal principal) {
+        // Check if user is logged in (principal will be null if not logged in)
+        boolean isLoggedIn = (principal != null);
+
+        // Pass this true/false value to the HTML
+        model.addAttribute("isLoggedIn", isLoggedIn);
+
         return "pricing";
     }
+    /* --------------------- */
 
     @GetMapping("/admin/dashboard")
     public String adminDashboard() {

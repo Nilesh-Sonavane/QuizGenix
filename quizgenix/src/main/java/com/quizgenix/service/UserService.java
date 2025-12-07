@@ -127,4 +127,9 @@ public class UserService {
         Duration diff = Duration.between(tokenCreationDate, now);
         return diff.toMinutes() >= EXPIRE_TOKEN_AFTER_MINUTES;
     }
+
+    // Inside UserService.java
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizGenix | Next Gen Learning</title>
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         /* --- THEME SETTINGS --- */
@@ -36,7 +38,7 @@
             overflow-x: hidden;
         }
 
-        /* --- ANIMATIONS (Synced with Dashboard) --- */
+        /* --- ANIMATIONS --- */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -67,30 +69,6 @@
 
             to {
                 transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                transform: translateX(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
                 opacity: 1;
             }
         }
@@ -199,14 +177,22 @@
             line-height: 1.1;
             margin-bottom: 1.5rem;
             background: linear-gradient(to right, white, #cbd5e1);
+
+            /* FIXED: Standard property added */
             -webkit-background-clip: text;
+            background-clip: text;
+
             -webkit-text-fill-color: transparent;
             animation: slideUp 0.8s ease-out;
         }
 
         .hero h1 span {
             background: linear-gradient(to right, var(--primary), var(--accent));
+
+            /* FIXED: Standard property added */
             -webkit-background-clip: text;
+            background-clip: text;
+
             -webkit-text-fill-color: transparent;
         }
 
@@ -238,7 +224,6 @@
             animation: slideUp 0.8s ease-out backwards;
         }
 
-        /* Staggered Animation */
         .card:nth-child(1) {
             animation-delay: 0.4s;
         }
@@ -304,14 +289,14 @@
     <div class="orb orb-2"></div>
 
     <nav class="navbar">
-        <a href="#" class="brand">
+        <a th:href="@{/}" class="brand">
             <img th:src="@{/images/logo.png}" alt="Icon">
             <span>QuizGenix</span>
         </a>
         <div class="nav-items">
             <a href="#">Topics</a>
             <a href="#">Leaderboard</a>
-            <a href="#">Pricing</a>
+            <a th:href="@{/pricing}">Pricing</a>
         </div>
         <a th:href="@{/login}" class="btn-glow">Login</a>
     </nav>
@@ -341,7 +326,8 @@
     </section>
 
     <footer>
-        <p>&copy; 2025 QuizGenix. Engineered for the Future.</p>
+        <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> QuizGenix. Engineered for the
+            Future.</p>
     </footer>
 
 </body>

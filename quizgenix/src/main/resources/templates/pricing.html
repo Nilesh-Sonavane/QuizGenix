@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title>Pricing | QuizGenix</title>
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+        /* --- THEME SETTINGS --- */
+        :root {
+            --bg-dark: #0B0E14;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --primary: #8b5cf6;
+            --accent: #38bdf8;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gold: #fbbf24;
+            --success: #22c55e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- CUSTOM MODAL CSS --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            animation: popIn 0.3s ease-out forwards;
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .modal-icon svg {
+            width: 35px;
+            height: 35px;
+            color: #22c55e;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .modal-text {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .btn-modal {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn-modal:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        @keyframes popIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        .orb-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .orb-2 {
+            bottom: 10%;
+            right: -5%;
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            animation: float 7s infinite ease-in-out 1s;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 8%;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: fadeIn 1s;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .brand img {
+            height: 40px;
+        }
+
+        .btn-login {
+            padding: 0.6rem 1.5rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pricing-header {
+            text-align: center;
+            padding: 4rem 2rem 3rem 2rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .pricing-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-header h1 span {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pricing-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem 2rem;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+            animation: slideUp 0.8s ease-out backwards;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .pricing-card.featured {
+            background: linear-gradient(145deg, rgba(139, 92, 246, 0.1), rgba(56, 189, 248, 0.1));
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+            z-index: 2;
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.03) translateY(-10px);
+        }
+
+        .plan-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-price span {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .plan-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            height: 40px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 2rem;
+            flex: 1;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.8rem;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .features-list li svg {
+            width: 18px;
+            height: 18px;
+            color: #22c55e;
+            flex-shrink: 0;
+        }
+
+        .features-list li.disabled {
+            color: #52525b;
+            text-decoration: line-through;
+        }
+
+        .features-list li.disabled svg {
+            color: #52525b;
+        }
+
+        .btn-plan {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid var(--glass-border);
+            background: transparent;
+            color: white;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-plan:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-featured {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border: none;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-featured:hover {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .badge-best {
+            background: var(--primary);
+            color: white;
+        }
+
+        .badge-save {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <input type="hidden" id="userLoginStatus" th:value="${isLoggedIn}" />
+
+    <div id="global-loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">PROCESSING...</div>
+    </div>
+
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3 class="modal-title">Payment Successful!</h3>
+            <p class="modal-text">Welcome to QuizGenix Premium.<br>A confirmation email has been sent to you.</p>
+            <button onclick="redirectToDashboard()" class="btn-modal">Go to Dashboard</button>
+        </div>
+    </div>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <nav class="navbar">
+        <a th:href="@{/}" class="brand">
+            <img th:src="@{/images/logo.png}" alt="Logo">
+            <span>QuizGenix</span>
+        </a>
+        <a th:href="@{/login}" class="btn-login">Log In</a>
+    </nav>
+
+    <header class="pricing-header">
+        <h1>Choose your <span>Plan</span></h1>
+        <p>Flexible pricing for every learner in India.</p>
+    </header>
+
+    <div class="pricing-grid">
+        <div class="pricing-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">₹0 <span>/forever</span></div>
+            <p class="plan-desc">Basic access to test the platform.</p>
+            <ul class="features-list">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> 5 Quizzes / Month</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Standard Topics</li>
+                <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg> Advanced AI Mode</li>
+                <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg> Progress Analytics</li>
+            </ul>
+            <button onclick="handleFreePlan()" class="btn-plan">Get Started</button>
+        </div>
+
+        <div class="pricing-card">
+            <div class="plan-name">Monthly</div>
+            <div class="plan-price">₹199 <span>/mo</span></div>
+            <p class="plan-desc">Full access, billed month-to-month.</p>
+            <ul class="features-list">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Unlimited Quizzes</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> All Advanced Topics</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Detailed Analytics</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> No Commitment</li>
+            </ul>
+            <button onclick="startPayment(199, 'Monthly Plan')" class="btn-plan">Choose Monthly</button>
+        </div>
+
+        <div class="pricing-card">
+            <div class="badge badge-save">Save 25%</div>
+            <div class="plan-name">6-Month</div>
+            <div class="plan-price">₹899 <span>/6 mo</span></div>
+            <p class="plan-desc">Equivalent to <strong>₹149/mo</strong>.</p>
+            <ul class="features-list">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Everything in Monthly</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Priority Support</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Export Results PDF</li>
+            </ul>
+            <button onclick="startPayment(899, '6-Month Plan')" class="btn-plan">Choose 6-Month</button>
+        </div>
+
+        <div class="pricing-card featured">
+            <div class="badge badge-best">Best Value</div>
+            <div class="plan-name">1-Year</div>
+            <div class="plan-price">₹1,499 <span>/yr</span></div>
+            <p class="plan-desc">Equivalent to <strong>₹125/mo</strong>. Save 37%.</p>
+            <ul class="features-list">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> All Pro Features</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Early Access to Beta</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg> Team Leaderboards</li>
+            </ul>
+            <button onclick="startPayment(1499, 'Yearly Plan')" class="btn-plan btn-featured">Choose Yearly</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // 1. Read Login Status
+        const loginStatusField = document.getElementById('userLoginStatus');
+        const isLoggedIn = loginStatusField && loginStatusField.value === 'true';
+
+        // 2. Setup CSRF Token
+        $(function () {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            if (token && header) {
+                $(document).ajaxSend(function (e, xhr, options) {
+                    xhr.setRequestHeader(header, token);
+                });
+            }
+        });
+
+        // 3. Navigation Logic
+        function handleFreePlan() {
+            if (!isLoggedIn) {
+                window.location.href = "/login";
+            } else {
+                window.location.href = "/dashboard";
+            }
+        }
+
+        function redirectToDashboard() {
+            window.location.href = "/dashboard";
+        }
+
+        // 4. Payment Logic (Accepts PlanName now)
+        function startPayment(amount, planName) {
+            if (!isLoggedIn) {
+                window.location.href = "/login";
+                return;
+            }
+
+            document.getElementById('global-loader').style.display = 'flex';
+
+            $.ajax({
+                url: '/create-order',
+                data: JSON.stringify({ amount: amount, info: 'order_request' }),
+                contentType: 'application/json',
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    document.getElementById('global-loader').style.display = 'none';
+
+                    var options = {
+                        "key": "rzp_test_RogDac2hXMEr6f", // YOUR TEST KEY
+                        "amount": response.amount,
+                        "currency": "INR",
+                        "name": "QuizGenix",
+                        "description": planName, // Dynamic Plan Name
+                        "image": "/images/logo.png",
+                        "order_id": response.id,
+                        "handler": function (response) {
+                            document.getElementById('global-loader').style.display = 'flex';
+
+                            // PASS DYNAMIC DATA TO BACKEND
+                            updatePaymentOnServer(
+                                response.razorpay_order_id,
+                                response.razorpay_payment_id,
+                                "paid",
+                                amount,
+                                planName
+                            );
+                        },
+                        "prefill": { "name": "", "email": "", "contact": "" },
+                        "theme": { "color": "#8b5cf6" },
+                        "modal": {
+                            "ondismiss": function () {
+                                document.getElementById('global-loader').style.display = 'none';
+                            }
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function (response) {
+                        alert("Payment Failed: " + response.error.description);
+                        document.getElementById('global-loader').style.display = 'none';
+                    });
+                    rzp1.open();
+                },
+                error: function (error) {
+                    document.getElementById('global-loader').style.display = 'none';
+                    if (error.status === 401 || error.status === 403) {
+                        window.location.href = "/login";
+                    } else if (error.status === 404) {
+                        alert("Error: Backend /create-order endpoint missing.");
+                    } else {
+                        console.error(error);
+                        alert("Unable to initiate payment. Please try again.");
+                    }
+                }
+            });
+        }
+
+        function updatePaymentOnServer(orderId, paymentId, status, amount, planName) {
+            $.ajax({
+                url: '/update-payment',
+                // SEND DYNAMIC DATA IN JSON
+                data: JSON.stringify({
+                    order_id: orderId,
+                    payment_id: paymentId,
+                    status: status,
+                    amount: amount,
+                    plan_name: planName
+                }),
+                contentType: 'application/json',
+                type: 'POST',
+                success: function (response) {
+                    document.getElementById('global-loader').style.display = 'none';
+                    document.getElementById('success-modal').style.display = 'flex';
+                },
+                error: function (error) {
+                    document.getElementById('global-loader').style.display = 'none';
+                    alert("Payment verification failed on server.");
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

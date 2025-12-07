@@ -1,6 +1,8 @@
 package com.quizgenix.service;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,8 +31,6 @@ public class EmailService {
         String subject = "Verify your QuizGenix Account";
 
         String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
-
-        // FIX: Capitalize the first name (e.g. "alex" -> "Alex")
         String firstName = capitalize(user.getFirstName());
 
         String content = getEmailTemplate(
@@ -54,8 +54,6 @@ public class EmailService {
         String fromAddress = "contact@quizgenix.com";
         String senderName = "QuizGenix Support";
         String subject = "Reset Your Password";
-
-        // FIX: Capitalize the first name here too
         String firstName = capitalize(user.getFirstName());
 
         String content = getEmailTemplate(
@@ -71,37 +69,70 @@ public class EmailService {
     }
 
     // ============================================================
-    // HELPER: Capitalize First Letter
+    // 3. PAYMENT SUCCESS EMAIL (DYNAMIC DATA)
+    // ============================================================
+    public void sendPaymentSuccessEmail(String toAddress, String name, String paymentId, String amount, String planName)
+            throws MessagingException, UnsupportedEncodingException {
+
+        String fromAddress = "billing@quizgenix.com";
+        String senderName = "QuizGenix Billing";
+        String subject = "Payment Receipt - " + planName;
+
+        String displayName = capitalize(name);
+
+        // Get Current Date (e.g., "07 Dec 2025")
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+
+        // Build the inner HTML body with DYNAMIC VARIABLES
+        // Using inline CSS to ensure it renders correctly in Gmail/Outlook
+        String messageBody = "Your subscription to the <strong>" + planName
+                + "</strong> is successfully confirmed.<br><br>" +
+                "Here are your transaction details:<br><br>" +
+                "<div style='background-color:#1e293b; padding:20px; border-radius:12px; border:1px solid #334155; text-align:left;'>"
+                +
+                "  <p style='margin:8px 0; color:#94a3b8; font-size:14px;'>Date: <span style='color:#fff; float:right;'>"
+                + date + "</span></p>" +
+                "  <p style='margin:8px 0; color:#94a3b8; font-size:14px;'>Plan: <span style='color:#fff; float:right;'>"
+                + planName + "</span></p>" +
+                "  <p style='margin:8px 0; color:#94a3b8; font-size:14px;'>Transaction ID: <span style='color:#fbbf24; float:right; font-family:monospace;'>"
+                + paymentId + "</span></p>" +
+                "  <hr style='border:0; border-top:1px solid #334155; margin:15px 0;'>" +
+                "  <p style='margin:8px 0; color:#fff; font-size:18px; font-weight:bold;'>Total Paid: <span style='color:#38bdf8; float:right;'>₹"
+                + amount + "</span></p>" +
+                "</div><br>" +
+                "Thank you for investing in your learning journey!";
+
+        String content = getEmailTemplate(
+                "Payment Successful! 🎉",
+                "Hello, " + displayName,
+                messageBody,
+                "Go to Dashboard",
+                "http://localhost:8080/dashboard" // Update this for production
+        );
+
+        sendEmail(toAddress, fromAddress, senderName, subject, content);
+    }
+
+    // ============================================================
+    // HELPER METHODS
     // ============================================================
     private String capitalize(String str) {
-        if (str == null || str.isEmpty()) {
+        if (str == null || str.isEmpty())
             return str;
-        }
-        // Takes first char, uppercases it, then appends the rest of the string in
-        // lowercase
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
-    // ============================================================
-    // HELPER: CENTRALIZED EMAIL SENDING LOGIC
-    // ============================================================
     private void sendEmail(String to, String from, String senderName, String subject, String content)
             throws MessagingException, UnsupportedEncodingException {
-
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
-
         helper.setFrom(from, senderName);
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(content, true); // true = sends as HTML
-
+        helper.setText(content, true);
         mailSender.send(message);
     }
 
-    // ============================================================
-    // HELPER: HTML TEMPLATE BUILDER
-    // ============================================================
     private String getEmailTemplate(String headerTitle, String greeting, String messageBody, String buttonText,
             String linkUrl) {
         return """
@@ -135,11 +166,9 @@ public class EmailService {
                         <p class="description">
                             """ + messageBody + """
                         </p>
-
                         <a href=\"""" + linkUrl + """
                         " class="btn" target="_blank">""" + buttonText + """
                                     </a>
-
                                     <p style="margin-top: 30px; font-size: 13px; color: #555;">
                                         If you didn't request this, you can safely ignore this email.
                                     </p>

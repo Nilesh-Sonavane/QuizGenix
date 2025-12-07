@@ -21,31 +21,42 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
+                                // 1. PRICING FEATURE: Disable CSRF for Payment Endpoints
+                                // This allows the Razorpay AJAX calls to POST without getting blocked
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/create-order", "/update-payment"))
+
                                 .authorizeHttpRequests((requests) -> requests
-                                                // 1. Static Resources
+                                                // 2. Static Resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/logo.png",
                                                                 "/profile.png")
                                                 .permitAll()
 
-                                                // 2. Public Pages
-                                                .requestMatchers("/", "/login", "/register", "/verify",
-                                                                "/forgot-password/**", "/new-password")
+                                                // 3. Public Pages (Added "/pricing")
+                                                .requestMatchers(
+                                                                "/",
+                                                                "/login",
+                                                                "/register",
+                                                                "/verify",
+                                                                "/forgot-password/**",
+                                                                "/new-password",
+                                                                "/pricing")
                                                 .permitAll()
 
-                                                // 3. Protected Pages
+                                                // 4. Protected Pages
                                                 .anyRequest().authenticated())
+
                                 .formLogin((form) -> form
                                                 .loginPage("/login")
                                                 .defaultSuccessUrl("/dashboard", true)
                                                 .permitAll())
+
                                 .logout((logout) -> logout
-                                                // FIX: Use a Lambda Expression instead of AntPathRequestMatcher
-                                                // This checks if the URL ends with "/logout" manually.
+                                                // Your original logic preserved
                                                 .logoutRequestMatcher(
                                                                 request -> request.getRequestURI().endsWith("/logout"))
-
                                                 .logoutSuccessUrl("/login?logout")
                                                 .permitAll())
+
                                 .userDetailsService(userDetailsService);
 
                 return http.build();
