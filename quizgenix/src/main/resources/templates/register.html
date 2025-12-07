@@ -7,8 +7,8 @@
     <title>Sign Up | QuizGenix</title>
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* Local overrides matching your design */
@@ -36,6 +36,11 @@
         .brand-logo {
             width: 50px;
             margin-bottom: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover {
+            transform: scale(1.1);
         }
 
         h2 {
@@ -107,6 +112,7 @@
             font-size: 1rem;
             cursor: pointer;
             margin-top: 1rem;
+            transition: 0.3s;
         }
 
         .btn-submit:hover {
@@ -152,6 +158,24 @@
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
+        /* Home Link Style */
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            opacity: 0.8;
+        }
+
+        .home-link:hover {
+            opacity: 1;
+            color: white;
+        }
+
         @media(max-width: 480px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -172,14 +196,18 @@
     <div class="orb orb-2"></div>
 
     <div class="register-card">
-        <img th:src="@{/images/logo.png}" alt="QuizGenix" class="brand-logo">
+
+        <a th:href="@{/}">
+            <img th:src="@{/images/logo.png}" alt="QuizGenix" class="brand-logo">
+        </a>
+
         <h2>Join the Community</h2>
         <p style="color:#94a3b8; margin-bottom: 1.5rem;">Start generating unlimited AI quizzes today.</p>
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         <div th:if="${param.error}" class="alert alert-danger">Registration failed. Please check details.</div>
 
-        <form th:action="@{/register}" th:object="${user}" method="POST">
+        <form th:action="@{/register}" th:object="${user}" method="POST" id="registerForm">
             <div class="form-row">
                 <div class="input-group">
                     <label>First Name</label>
@@ -216,9 +244,17 @@
         <p style="margin-top: 1.5rem; color: #94a3b8; font-size: 0.9rem;">
             Already have an account? <a th:href="@{/login}" style="color: #3b82f6; text-decoration: none;">Sign In</a>
         </p>
+
+        <a th:href="@{/}" class="home-link">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
     </div>
 
-    <script th:src="@{/js/script.js}"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function () {
+            document.getElementById('global-loader').style.display = 'flex';
+        });
+    </script>
 
 </body>
 

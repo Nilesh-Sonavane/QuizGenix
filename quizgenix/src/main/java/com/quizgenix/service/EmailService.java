@@ -30,9 +30,12 @@ public class EmailService {
 
         String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
 
+        // FIX: Capitalize the first name (e.g. "alex" -> "Alex")
+        String firstName = capitalize(user.getFirstName());
+
         String content = getEmailTemplate(
                 "Welcome to QuizGenix! 👋",
-                "Hello, " + user.getFirstName() + "!",
+                "Hello, " + firstName + "!",
                 "Thank you for joining <strong>QuizGenix</strong>. We are excited to have you on board!<br><br>" +
                         "To get started with AI-powered learning, please verify your email address by clicking the button below.",
                 "Verify My Account",
@@ -44,23 +47,39 @@ public class EmailService {
     // ============================================================
     // 2. FORGOT PASSWORD EMAIL
     // ============================================================
-    public void sendResetPasswordEmail(String email, String resetURL)
+    public void sendResetPasswordEmail(User user, String resetURL)
             throws MessagingException, UnsupportedEncodingException {
 
+        String toAddress = user.getEmail();
         String fromAddress = "contact@quizgenix.com";
         String senderName = "QuizGenix Support";
         String subject = "Reset Your Password";
 
+        // FIX: Capitalize the first name here too
+        String firstName = capitalize(user.getFirstName());
+
         String content = getEmailTemplate(
                 "Password Reset Request 🔒",
-                "Hello,",
+                "Hello, " + firstName,
                 "We received a request to reset the password for your QuizGenix account.<br><br>" +
                         "If you requested this, please click the button below to create a new password. " +
                         "This link will expire in 30 minutes.",
                 "Reset Password",
                 resetURL);
 
-        sendEmail(email, fromAddress, senderName, subject, content);
+        sendEmail(toAddress, fromAddress, senderName, subject, content);
+    }
+
+    // ============================================================
+    // HELPER: Capitalize First Letter
+    // ============================================================
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        // Takes first char, uppercases it, then appends the rest of the string in
+        // lowercase
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     // ============================================================
@@ -81,7 +100,7 @@ public class EmailService {
     }
 
     // ============================================================
-    // HELPER: HTML TEMPLATE BUILDER (Reused for both emails)
+    // HELPER: HTML TEMPLATE BUILDER
     // ============================================================
     private String getEmailTemplate(String headerTitle, String greeting, String messageBody, String buttonText,
             String linkUrl) {
@@ -119,19 +138,19 @@ public class EmailService {
 
                         <a href=\"""" + linkUrl + """
                         " class="btn" target="_blank">""" + buttonText + """
-                                        </a>
+                                    </a>
 
-                                        <p style="margin-top: 30px; font-size: 13px; color: #555;">
-                                            If you didn't request this, you can safely ignore this email.
-                                        </p>
-                                    </div>
-                                    <div class="footer">
-                                        &copy; 2025 QuizGenix. All rights reserved.<br>
-                                        <a href="#">Privacy Policy</a> | <a href="#">Support</a>
-                                    </div>
+                                    <p style="margin-top: 30px; font-size: 13px; color: #555;">
+                                        If you didn't request this, you can safely ignore this email.
+                                    </p>
                                 </div>
-                            </body>
-                            </html>
+                                <div class="footer">
+                                    &copy; 2025 QuizGenix. All rights reserved.<br>
+                                    <a href="#">Privacy Policy</a> | <a href="#">Support</a>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
                         """;
     }
 }

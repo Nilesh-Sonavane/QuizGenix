@@ -29,7 +29,7 @@ public class SecurityConfig {
 
                                                 // 2. Public Pages
                                                 .requestMatchers("/", "/login", "/register", "/verify",
-                                                                "/forgot-password", "/reset-password")
+                                                                "/forgot-password/**", "/new-password")
                                                 .permitAll()
 
                                                 // 3. Protected Pages
