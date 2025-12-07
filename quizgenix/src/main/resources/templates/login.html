@@ -7,22 +7,54 @@
     <title>Login | QuizGenix</title>
 
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
-
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" th:href="@{/css/style.css}">
 
     <style>
-        /* Login Page Specific Styles */
+        /* --- THEME VARS --- */
+        :root {
+            --bg-dark: #0B0E14;
+            --primary: #8b5cf6;
+            --accent: #38bdf8;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
         body {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
             overflow: hidden;
             position: relative;
+        }
+
+        /* --- ORB ANIMATION --- */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .orb {
@@ -49,6 +81,19 @@
             height: 400px;
             background: var(--accent);
             animation-delay: 1s;
+        }
+
+        /* --- LOGIN CARD --- */
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .login-card {
@@ -80,6 +125,7 @@
             font-size: 0.9rem;
         }
 
+        /* --- FORM ELEMENTS --- */
         .input-group {
             margin-bottom: 1.5rem;
             text-align: left;
@@ -172,10 +218,58 @@
             background: rgba(56, 189, 248, 0.1);
             border: 1px solid rgba(56, 189, 248, 0.2);
         }
+
+        /* --- LOADER STYLES (Matching registration.html) --- */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 14, 20, 0.85);
+            /* Dark semi-transparent bg */
+            display: none;
+            /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="global-loader" class="loader-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">SIGNING IN...</div>
+    </div>
 
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -186,25 +280,14 @@
         <h2>Welcome Back</h2>
         <p class="subtitle">Enter your credentials to access the AI Core.</p>
 
-        <div th:if="${param.error}" class="alert alert-danger">
-            Invalid email or password.
-        </div>
-
-        <div th:if="${param.logout}" class="alert alert-success">
-            You have been logged out.
-        </div>
-
-        <div th:if="${param.verify_email}" class="alert alert-info">
-            Registration successful! Please check your email to verify your account.
-        </div>
-
-        <div th:if="${param.verified}" class="alert alert-success">
-            Account verified! You can now sign in.
-        </div>
-
-        <div th:if="${param.verify_error}" class="alert alert-danger">
-            Verification failed. The code may be invalid or expired.
-        </div>
+        <div th:if="${param.error}" class="alert alert-danger">Invalid email or password.</div>
+        <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
+        <div th:if="${param.verify_email}" class="alert alert-info">Registration successful! Please check your email to
+            verify your account.</div>
+        <div th:if="${param.verified}" class="alert alert-success">Account verified! You can now sign in.</div>
+        <div th:if="${param.verify_error}" class="alert alert-danger">Verification failed. The code may be invalid or
+            expired.</div>
+        <div th:if="${param.resetSuccess}" class="alert alert-success">Password reset successful! Please login.</div>
 
         <form th:action="@{/login}" method="POST" id="loginForm">
             <div class="input-group">
@@ -221,12 +304,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit" id="loginBtn">
-                <span id="btnText">Sign In</span>
-                <span id="btnLoader" style="display: none;">
-                    <i class="fas fa-circle-notch fa-spin"></i>
-                </span>
-            </button>
+            <button type="submit" class="btn-submit">Sign In</button>
         </form>
 
         <p class="footer-link">New to QuizGenix? <a th:href="@{/register}">Create Account</a></p>
@@ -234,17 +312,8 @@
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function () {
-            var btn = document.getElementById('loginBtn');
-            var text = document.getElementById('btnText');
-            var loader = document.getElementById('btnLoader');
-
-            // Prevent double clicking
-            btn.style.opacity = "0.8";
-            btn.style.cursor = "wait";
-
-            // Toggle visibility
-            text.style.display = "none";
-            loader.style.display = "inline-block";
+            // Show the loader overlay matching registration.html
+            document.getElementById('global-loader').style.display = 'flex';
         });
     </script>
 
