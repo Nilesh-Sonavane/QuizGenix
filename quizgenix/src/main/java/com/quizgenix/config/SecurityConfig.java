@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.quizgenix.service.CustomUserDetailsService;
@@ -18,11 +16,13 @@ public class SecurityConfig {
         @Autowired
         private CustomUserDetailsService userDetailsService;
 
+        @Autowired
+        private CustomLoginSuccessHandler successHandler;
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 // 1. PRICING FEATURE: Disable CSRF for Payment Endpoints
-                                // This allows the Razorpay AJAX calls to POST without getting blocked
                                 .csrf(csrf -> csrf.ignoringRequestMatchers("/create-order", "/update-payment"))
 
                                 .authorizeHttpRequests((requests) -> requests
@@ -31,7 +31,7 @@ public class SecurityConfig {
                                                                 "/profile.png")
                                                 .permitAll()
 
-                                                // 3. Public Pages (Added "/pricing")
+                                                // 3. Public Pages
                                                 .requestMatchers(
                                                                 "/",
                                                                 "/login",
@@ -47,7 +47,8 @@ public class SecurityConfig {
 
                                 .formLogin((form) -> form
                                                 .loginPage("/login")
-                                                .defaultSuccessUrl("/dashboard", true)
+                                                // 5. Use Custom Handler to check Plan Expiry
+                                                .successHandler(successHandler)
                                                 .permitAll())
 
                                 .logout((logout) -> logout
@@ -62,8 +63,5 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
-        }
+        // REMOVED: passwordEncoder() bean is now in AppConfig.java
 }

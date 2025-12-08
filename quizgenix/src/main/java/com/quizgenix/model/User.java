@@ -54,4 +54,22 @@ public class User {
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate; // New field for expiration
 
+    // --- SUBSCRIPTION FIELDS ---
+
+    // Default to "Free"
+    @Column(columnDefinition = "varchar(255) default 'Free'")
+    private String activePlan = "Free";
+
+    private Double currentPlanPrice = 0.0; // Free plan value is 0.0
+
+    private LocalDateTime planStartDate;
+    private LocalDateTime planExpiryDate;
+
+    // Helper: Check if user has a PAID active subscription
+    public boolean isPaidSubscriptionActive() {
+        return !"Free".equalsIgnoreCase(activePlan)
+                && planExpiryDate != null
+                && planExpiryDate.isAfter(LocalDateTime.now());
+    }
+
 }

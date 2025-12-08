@@ -27,6 +27,7 @@ public class Payment {
     private String status; // created, paid, failed
     private String amount; // Amount paid
     private String receiptEmail; // User's email
+    private String planName; // "Monthly Plan", "Yearly Plan"
 
     @CreationTimestamp
     private LocalDateTime createdAt;

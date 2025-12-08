@@ -56,6 +56,12 @@ public class UserService {
         String randomCode = UUID.randomUUID().toString();
         user.setVerificationCode(randomCode);
 
+        // --- SET DEFAULT FREE PLAN (Logic Added Here) ---
+        user.setActivePlan("Free");
+        user.setCurrentPlanPrice(0.0);
+        user.setPlanStartDate(LocalDateTime.now());
+        user.setPlanExpiryDate(null); // Null implies forever free until upgrade
+
         // 5. Save User
         userRepository.save(user);
 
@@ -65,8 +71,21 @@ public class UserService {
             emailService.sendVerificationEmail(user, siteURL);
         }
     }
+
     // ========================================================================
-    // 2. EMAIL VERIFICATION LOGIC
+    // 2. HELPER METHODS (Required by PaymentController)
+    // ========================================================================
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    // ========================================================================
+    // 3. EMAIL VERIFICATION LOGIC
     // ========================================================================
 
     public boolean verify(String verificationCode) {
@@ -83,7 +102,7 @@ public class UserService {
     }
 
     // ========================================================================
-    // 3. FORGOT PASSWORD LOGIC (Token Generation)
+    // 4. FORGOT PASSWORD LOGIC (Token Generation)
     // ========================================================================
 
     public String updateResetPasswordToken(String email) throws UsernameNotFoundException {
@@ -101,7 +120,7 @@ public class UserService {
     }
 
     // ========================================================================
-    // 4. FORGOT PASSWORD LOGIC (Validation & Update)
+    // 5. FORGOT PASSWORD LOGIC (Validation & Update)
     // ========================================================================
 
     public User getByResetPasswordToken(String token) {
@@ -128,8 +147,22 @@ public class UserService {
         return diff.toMinutes() >= EXPIRE_TOKEN_AFTER_MINUTES;
     }
 
-    // Inside UserService.java
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    /**
+     * Checks if the user's plan has expired.
+     * If expired, downgrades to Free plan and updates DB.
+     */
+    public User checkAndExpirePlan(User user) {
+        if (user.getPlanExpiryDate() != null && LocalDateTime.now().isAfter(user.getPlanExpiryDate())) {
+
+            // Plan has expired: Downgrade logic
+            user.setActivePlan("Free");
+            user.setCurrentPlanPrice(0.0);
+            user.setPlanExpiryDate(null); // Or set to past date if you track history
+            user.setPlanStartDate(null);
+
+            // Save changes to DB
+            return userRepository.save(user);
+        }
+        return user;
     }
 }
