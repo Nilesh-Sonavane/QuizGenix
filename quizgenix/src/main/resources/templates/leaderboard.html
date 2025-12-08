@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::section}, 'Leaderboard')}">
+
+<head>
+</head>
+
+<body>
+
+    <section>
+
+        <h1>Leaderboard</h1>
+        <p class="welcome-text">See where you stand among the best developers!</p>
+
+        <div class="podium-container">
+            <div class="podium-card podium-2">
+                <div class="podium-avatar" style="background-color: #94a3b8;"></div>
+                <div class="p-rank">2</div>
+                <div class="p-name">Dev_Master</div>
+                <div class="p-xp">3,100 XP</div>
+            </div>
+
+            <div class="podium-card podium-1">
+                <div class="crown">👑</div>
+                <div class="podium-avatar" style="background-color: #fbbf24;"></div>
+                <div class="p-rank">1</div>
+                <div class="p-name">Sarah_Codes</div>
+                <div class="p-xp">3,450 XP</div>
+            </div>
+
+            <div class="podium-card podium-3">
+                <div class="podium-avatar" style="background-color: #b45309;"></div>
+                <div class="p-rank">3</div>
+                <div class="p-name">BugHunter</div>
+                <div class="p-xp">2,800 XP</div>
+            </div>
+        </div>
+
+        <div class="leaderboard-list">
+            <div class="list-header">
+                <span>#</span>
+                <span>PLAYER</span>
+                <span>XP</span>
+                <span>QUIZZES</span>
+            </div>
+
+            <div class="list-item">
+                <span class="l-rank">4</span>
+                <div class="l-user">
+                    <div class="l-avatar-sm"></div>CodeNinja
+                </div>
+                <span class="l-xp">2,500 XP</span>
+                <span class="l-quizzes">18</span>
+            </div>
+
+            <div class="list-item">
+                <span class="l-rank">5</span>
+                <div class="l-user">
+                    <div class="l-avatar-sm"></div>ReactPro
+                </div>
+                <span class="l-xp">2,100 XP</span>
+                <span class="l-quizzes">15</span>
+            </div>
+
+            <div class="list-item">
+                <span class="l-rank">6</span>
+                <div class="l-user">
+                    <div class="l-avatar-sm"></div>JavaGuru
+                </div>
+                <span class="l-xp">1,900 XP</span>
+                <span class="l-quizzes">14</span>
+            </div>
+
+            <div class="list-item">
+                <span class="l-rank">7</span>
+                <div class="l-user">
+                    <div class="l-avatar-sm"></div>System42
+                </div>
+                <span class="l-xp">1,850 XP</span>
+                <span class="l-quizzes">12</span>
+            </div>
+        </div>
+
+        <div class="sticky-rank">
+            <span class="l-rank" style="color: white;">42</span>
+            <div class="l-user">
+                <div class="l-avatar-sm" style="background: #8b5cf6;"></div>
+                You (Alex Dev)
+            </div>
+            <span class="l-xp">2,450 XP</span>
+            <span class="l-quizzes">12</span>
+        </div>
+
+    </section>
+
+</body>
+
+</html>

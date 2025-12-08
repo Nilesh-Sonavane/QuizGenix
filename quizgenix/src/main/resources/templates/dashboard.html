@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::section}, 'Dashboard')}">
+
+<head>
+    <style>
+        /* Specific Styles for Dashboard Widgets */
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .welcome-text {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s backwards;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #38bdf8;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-card p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            position: relative;
+            z-index: 2;
+        }
+
+        .xp-card h3 {
+            color: #fbbf24;
+        }
+
+        .stat-card::after {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 3.5rem;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .stat-card:nth-child(1)::after {
+            content: '✅';
+            color: #38bdf8;
+        }
+
+        .stat-card:nth-child(2)::after {
+            content: '⚡';
+            color: #fbbf24;
+        }
+
+        .stat-card:nth-child(3)::after {
+            content: '🎯';
+            color: #22c55e;
+        }
+
+        .stat-card:nth-child(4)::after {
+            content: '🏆';
+            color: #a855f7;
+        }
+
+        .ai-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(56, 189, 248, 0.1));
+            border: 1px solid #8b5cf6;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            animation: slideUp 1s ease-out backwards;
+            animation-delay: 0.5s;
+        }
+
+        .ai-input-group {
+            display: flex;
+            align-items: center;
+            max-width: 700px;
+            margin: 1.5rem auto 0 auto;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50px;
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .difficulty-select,
+        .questions-select {
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            outline: none;
+            padding: 0 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            height: 100%;
+        }
+
+        .difficulty-select option,
+        .questions-select option {
+            background: #111;
+            color: white;
+        }
+
+        .ai-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 1rem;
+            outline: none;
+        }
+
+        .btn-generate {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-split {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .topic-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s;
+            animation: slideUp 0.8s backwards;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #38bdf8;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .leaderboard-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            height: 100%;
+            animation: slideInRight 1s backwards;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            background: #333;
+            color: white;
+        }
+
+        .rank-1 {
+            background: #fbbf24;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <section>
+        <h1 class="text-cap" th:text="'Hello, ' + ${user.firstName} + '! 👋'">Hello!</h1>
+        <p class="welcome-text">Ready to challenge your brain today?</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>12</h3>
+                <p>Quizzes Completed</p>
+            </div>
+            <div class="stat-card xp-card">
+                <h3>2,450</h3>
+                <p>Total XP Earned</p>
+            </div>
+            <div class="stat-card">
+                <h3>85%</h3>
+                <p>Average Score</p>
+            </div>
+            <div class="stat-card">
+                <h3>#42</h3>
+                <p>Global Rank</p>
+            </div>
+        </div>
+
+        <div class="ai-section">
+            <div class="ai-content">
+                <h2>Generate a New Quiz</h2>
+                <p style="color: #cbd5e1; margin-top: 0.5rem;">Enter any topic, skill, or concept.</p>
+
+                <div class="ai-input-group">
+                    <select class="difficulty-select">
+                        <option value="easy" selected>Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                        <option value="expert">Expert</option>
+                    </select>
+
+                    <select class="questions-select">
+                        <option value="10">10 Qs</option>
+                        <option value="25">25 Qs</option>
+                        <option value="50">50 Qs</option>
+                        <option value="100">100 Qs</option>
+                    </select>
+
+                    <input type="text" class="ai-input" placeholder="e.g., 'Spring Boot Security'">
+
+                    <button class="btn-generate">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                            </path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                        Generate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-split">
+            <div>
+                <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Popular Topics</h3>
+                <div class="topics-grid">
+                    <div class="topic-card">
+                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">☕</div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">Java Basics</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">15 Questions • Easy</div>
+                    </div>
+                    <div class="topic-card">
+                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">🐍</div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">Python Data</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">20 Questions • Medium</div>
+                    </div>
+                    <div class="topic-card">
+                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">⚛️</div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">React JS</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">10 Questions • Hard</div>
+                    </div>
+                    <div class="topic-card">
+                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">🗄️</div>
+                        <div style="font-weight: bold; margin-bottom: 0.5rem;">SQL Queries</div>
+                        <div style="font-size: 0.8rem; color: #94a3b8;">12 Questions • Medium</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Top Players 🏆</h3>
+                <div class="leaderboard-box">
+                    <div class="player-row">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="rank-badge rank-1">1</div>
+                            <span style="font-weight: 500; font-size: 0.95rem;">Sarah_Codes</span>
+                        </div>
+                        <span style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;">2,450 XP</span>
+                    </div>
+                    <div class="player-row">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="rank-badge" style="background:#e2e8f0; color:black;">2</div>
+                            <span style="font-weight: 500; font-size: 0.95rem;">Dev_Master</span>
+                        </div>
+                        <span style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;">2,100 XP</span>
+                    </div>
+                    <div class="player-row">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="rank-badge" style="background:#b45309; color:white;">3</div>
+                            <span style="font-weight: 500; font-size: 0.95rem;">BugHunter</span>
+                        </div>
+                        <span style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;">1,950 XP</span>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <a th:href="@{/leaderboard}"
+                            style="color: #94a3b8; font-size: 0.85rem; text-decoration: none;">View Full Leaderboard
+                            →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::section}, 'My Quizzes')}">
+
+<head>
+</head>
+
+<body>
+
+    <section>
+
+        <h1>My Quizzes</h1>
+
+        <div class="filter-bar">
+            <div class="search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search past quizzes..." onkeyup="filterQuizzes()">
+            </div>
+
+            <select class="filter-select" id="topicFilter" onchange="filterQuizzes()">
+                <option value="all">All Topics</option>
+                <option value="Java">Java</option>
+                <option value="Python">Python</option>
+                <option value="React">React</option>
+            </select>
+
+            <select class="filter-select" id="statusFilter" onchange="filterQuizzes()">
+                <option value="all">All Status</option>
+                <option value="passed">Passed</option>
+                <option value="failed">Failed</option>
+            </select>
+        </div>
+
+        <div class="history-grid">
+
+            <div class="history-card high-score" data-topic="Java" data-status="passed">
+                <div class="h-header">
+                    <span class="h-difficulty">Medium</span>
+                    <span class="h-date">2 hours ago</span>
+                </div>
+                <div class="h-topic">Java Basics</div>
+                <div class="h-score">
+                    <div>
+                        <div class="score-val">90%</div>
+                        <div class="score-status">Excellent</div>
+                    </div>
+                    <div style="font-size: 2rem;">🏆</div>
+                </div>
+                <div class="h-actions">
+                    <a href="#" class="btn-small btn-review">Review</a>
+                    <a href="#" class="btn-small btn-retake">Retake</a>
+                </div>
+            </div>
+
+            <div class="history-card mid-score" data-topic="Spring" data-status="passed">
+                <div class="h-header">
+                    <span class="h-difficulty">Hard</span>
+                    <span class="h-date">Yesterday</span>
+                </div>
+                <div class="h-topic">Spring Security</div>
+                <div class="h-score">
+                    <div>
+                        <div class="score-val">65%</div>
+                        <div class="score-status">Good</div>
+                    </div>
+                    <div style="font-size: 2rem;">🤔</div>
+                </div>
+                <div class="h-actions">
+                    <a href="#" class="btn-small btn-review">Review</a>
+                    <a href="#" class="btn-small btn-retake">Retake</a>
+                </div>
+            </div>
+
+            <div class="history-card low-score" data-topic="React" data-status="failed">
+                <div class="h-header">
+                    <span class="h-difficulty">Expert</span>
+                    <span class="h-date">3 days ago</span>
+                </div>
+                <div class="h-topic">React Hooks</div>
+                <div class="h-score">
+                    <div>
+                        <div class="score-val">40%</div>
+                        <div class="score-status">Failed</div>
+                    </div>
+                    <div style="font-size: 2rem;">📉</div>
+                </div>
+                <div class="h-actions">
+                    <a href="#" class="btn-small btn-review">Review</a>
+                    <a href="#" class="btn-small btn-retake">Retake</a>
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+            function filterQuizzes() {
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const topic = document.getElementById('topicFilter').value.toLowerCase();
+                const status = document.getElementById('statusFilter').value.toLowerCase();
+
+                const cards = document.querySelectorAll('.history-card');
+
+                cards.forEach(card => {
+                    // Get data from our hardcoded attributes
+                    const cardTopic = (card.getAttribute('data-topic') || "").toLowerCase();
+                    const cardStatus = (card.getAttribute('data-status') || "").toLowerCase();
+                    const visibleText = card.innerText.toLowerCase();
+
+                    const textMatch = visibleText.includes(search);
+
+                    // Logic for "All" or match
+                    const topicMatch = (topic === 'all') || cardTopic.includes(topic);
+                    const statusMatch = (status === 'all') || (cardStatus === status);
+
+                    if (textMatch && topicMatch && statusMatch) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+        </script>
+
+    </section>
+
+</body>
+
+</html>

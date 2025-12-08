@@ -161,6 +161,138 @@
             box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
         }
 
+        /* --- DROPDOWN MENU STYLES --- */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .user-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .user-trigger:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        .nav-avatar-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            /* Ensures the photo isn't squashed */
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-username {
+            font-weight: 600;
+            color: white;
+            font-size: 0.95rem;
+            text-transform: capitalize;
+            /* MAKES IT CAPITALIZED AUTOMATICALLY */
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            width: 200px;
+            background: #1e293b;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: 0.3s ease;
+            z-index: 200;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 5px 0;
+        }
+
+        @media(max-width: 768px) {
+
+            /* Existing code */
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .nav-items {
+                display: none;
+            }
+
+            /* --- NEW RESPONSIVE FIXES --- */
+
+            /* 1. Hide the Name on mobile, keep only Avatar */
+            .nav-username {
+                display: none;
+            }
+
+            /* 2. Adjust margins for the dropdown trigger */
+            .user-dropdown {
+                margin-left: 10px;
+                /* Reduce margin */
+            }
+
+            /* 3. Make sure the dropdown menu doesn't go off-screen */
+            .dropdown-menu {
+                right: -10px;
+                /* Pull it slightly right to align with screen edge */
+                width: 180px;
+                /* Slightly smaller width */
+            }
+        }
+
         /* --- HERO SECTION --- */
         .hero {
             flex: 1;
@@ -177,22 +309,16 @@
             line-height: 1.1;
             margin-bottom: 1.5rem;
             background: linear-gradient(to right, white, #cbd5e1);
-
-            /* FIXED: Standard property added */
             -webkit-background-clip: text;
             background-clip: text;
-
             -webkit-text-fill-color: transparent;
             animation: slideUp 0.8s ease-out;
         }
 
         .hero h1 span {
             background: linear-gradient(to right, var(--primary), var(--accent));
-
-            /* FIXED: Standard property added */
             -webkit-background-clip: text;
             background-clip: text;
-
             -webkit-text-fill-color: transparent;
         }
 
@@ -298,7 +424,45 @@
             <a href="#">Leaderboard</a>
             <a th:href="@{/pricing}">Pricing</a>
         </div>
-        <a th:href="@{/login}" class="btn-glow">Login</a>
+
+        <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn-glow">Login</a>
+
+        <div th:if="${isLoggedIn}" class="user-dropdown">
+            <div class="user-trigger">
+
+                <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                    th:src="@{'/images/' + ${user.profileImage}}" class="nav-avatar-img" alt="Avatar">
+
+                <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">
+                    A
+                </div>
+
+                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">Alex Dev</span>
+
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </div>
+
+            <div class="dropdown-menu">
+                <a th:href="@{/dashboard}" class="dropdown-item">
+                    <span>⚡</span> Dashboard
+                </a>
+                <a th:href="@{/my-quizzes}" class="dropdown-item">
+                    <span>📚</span> My Quizzes
+                </a>
+                <a th:href="@{/settings}" class="dropdown-item">
+                    <span>⚙️</span> Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <a th:href="@{/logout}" class="dropdown-item" style="color: #ef4444;">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
     </nav>
 
     <section class="hero">
@@ -329,6 +493,40 @@
         <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> QuizGenix. Engineered for the
             Future.</p>
     </footer>
+
+    <script>
+        // Toggle Dropdown on Click (for Mobile)
+        document.addEventListener('DOMContentLoaded', function () {
+            const trigger = document.querySelector('.user-trigger');
+            const menu = document.querySelector('.dropdown-menu');
+
+            if (trigger && menu) {
+                trigger.addEventListener('click', function (e) {
+                    e.stopPropagation(); // Prevent closing immediately
+
+                    // Toggle visibility manually
+                    if (menu.style.visibility === 'visible') {
+                        menu.style.opacity = '0';
+                        menu.style.visibility = 'hidden';
+                        menu.style.transform = 'translateY(-10px)';
+                    } else {
+                        menu.style.opacity = '1';
+                        menu.style.visibility = 'visible';
+                        menu.style.transform = 'translateY(0)';
+                    }
+                });
+
+                // Close when clicking anywhere else
+                document.addEventListener('click', function (e) {
+                    if (!trigger.contains(e.target)) {
+                        menu.style.opacity = '0';
+                        menu.style.visibility = 'hidden';
+                        menu.style.transform = 'translateY(-10px)';
+                    }
+                });
+            }
+        });
+    </script>
 
 </body>
 
