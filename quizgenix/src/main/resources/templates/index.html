@@ -202,7 +202,6 @@
             height: 35px;
             border-radius: 50%;
             object-fit: cover;
-            /* Ensures the photo isn't squashed */
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -211,7 +210,6 @@
             color: white;
             font-size: 0.95rem;
             text-transform: capitalize;
-            /* MAKES IT CAPITALIZED AUTOMATICALLY */
         }
 
         .dropdown-menu {
@@ -261,8 +259,6 @@
         }
 
         @media(max-width: 768px) {
-
-            /* Existing code */
             .hero h1 {
                 font-size: 2.5rem;
             }
@@ -271,25 +267,17 @@
                 display: none;
             }
 
-            /* --- NEW RESPONSIVE FIXES --- */
-
-            /* 1. Hide the Name on mobile, keep only Avatar */
             .nav-username {
                 display: none;
             }
 
-            /* 2. Adjust margins for the dropdown trigger */
             .user-dropdown {
                 margin-left: 10px;
-                /* Reduce margin */
             }
 
-            /* 3. Make sure the dropdown menu doesn't go off-screen */
             .dropdown-menu {
                 right: -10px;
-                /* Pull it slightly right to align with screen edge */
                 width: 180px;
-                /* Slightly smaller width */
             }
         }
 
@@ -396,16 +384,6 @@
             margin-top: 4rem;
             animation: fadeIn 1s ease-out 1s backwards;
         }
-
-        @media(max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .nav-items {
-                display: none;
-            }
-        }
     </style>
 </head>
 
@@ -447,16 +425,35 @@
             </div>
 
             <div class="dropdown-menu">
-                <a th:href="@{/dashboard}" class="dropdown-item">
-                    <span>⚡</span> Dashboard
-                </a>
-                <a th:href="@{/my-quizzes}" class="dropdown-item">
-                    <span>📚</span> My Quizzes
-                </a>
-                <a th:href="@{/settings}" class="dropdown-item">
-                    <span>⚙️</span> Settings
-                </a>
+
+                <div th:if="${user.role == 'ADMIN'}">
+                    <a th:href="@{/admin/dashboard}" class="dropdown-item">
+                        <span>📊</span> Admin Panel
+                    </a>
+                    <a th:href="@{/admin/users}" class="dropdown-item">
+                        <span>👥</span> Manage Users
+                    </a>
+                    <a th:href="@{/admin/settings}" class="dropdown-item">
+                        <span>⚙️</span> Settings
+                    </a>
+                </div>
+
+                <div th:unless="${user.role == 'ADMIN'}">
+                    <a th:href="@{/dashboard}" class="dropdown-item">
+                        <span>⚡</span> Dashboard
+                    </a>
+                    <a th:href="@{/my-quizzes}" class="dropdown-item">
+                        <span>📚</span> My Quizzes
+                    </a>
+                    <a th:href="@{/settings}" class="dropdown-item">
+                        <span>⚙️</span> Settings
+                    </a>
+                </div>
+
+
+
                 <div class="dropdown-divider"></div>
+
                 <a th:href="@{/logout}" class="dropdown-item" style="color: #ef4444;">
                     <span>🚪</span> Logout
                 </a>

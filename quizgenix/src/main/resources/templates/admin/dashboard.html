@@ -1,16 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Analytics')}">
 
 <head>
-    <th:block th:replace="~{base :: head}"></th:block>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-    <aside th:replace="~{base :: admin-sidebar(page='analytics')}"></aside>
-
-    <main class="main-content">
+    <section>
         <h1>Admin Analytics</h1>
         <p class="welcome-text">Real-time platform insights.</p>
 
@@ -25,11 +21,11 @@
             </div>
             <div class="stat-card">
                 <h3>850</h3>
-                <p>AI Quizzes</p>
+                <p>AI Quizzes Generated</p>
             </div>
             <div class="stat-card">
                 <h3>98%</h3>
-                <p>Uptime</p>
+                <p>Server Uptime</p>
             </div>
         </div>
 
@@ -40,6 +36,7 @@
                     <select class="chart-select">
                         <option>Last 6 Months</option>
                         <option>Last Year</option>
+                        <option>All Time</option>
                     </select>
                 </div>
                 <div class="chart-box">
@@ -52,6 +49,7 @@
                     <h3>Revenue Source</h3>
                     <select class="chart-select">
                         <option>Monthly</option>
+                        <option>6-Month</option>
                         <option>Yearly</option>
                     </select>
                 </div>
@@ -60,39 +58,40 @@
                 </div>
             </div>
         </div>
-    </main>
 
-    <div th:replace="~{base :: scripts}"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Line Chart
+                const ctx1 = document.getElementById('growthChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Users',
+                            data: [120, 190, 300, 500, 450, 700],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            borderWidth: 3, tension: 0.4, fill: true,
+                            pointBackgroundColor: '#0B0E14'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                });
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const ctx1 = document.getElementById('growthChart').getContext('2d');
-            new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Users',
-                        data: [120, 190, 300, 500, 450, 700],
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                        tension: 0.4, fill: true
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                // Doughnut Chart
+                const ctx2 = document.getElementById('revenueChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pro', 'Team', 'Ads'],
+                        datasets: [{ data: [65, 25, 10], backgroundColor: ['#3b82f6', '#a855f7', '#22c55e'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } } }
+                });
             });
-
-            const ctx2 = document.getElementById('revenueChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pro', 'Team', 'Ads'],
-                    datasets: [{ data: [65, 25, 10], backgroundColor: ['#3b82f6', '#a855f7', '#22c55e'], borderWidth: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } } }
-            });
-        });
-    </script>
+        </script>
+    </section>
 
 </body>
 

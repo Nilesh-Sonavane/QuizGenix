@@ -30,7 +30,10 @@ public class SecurityConfig {
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/logo.png",
                                                                 "/profile.png")
                                                 .permitAll()
-
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/dashboard", "/my-quizzes", "/quiz/**", "/result/**",
+                                                                "/settings/**")
+                                                .hasRole("USER")
                                                 // 3. Public Pages
                                                 .requestMatchers(
                                                                 "/",

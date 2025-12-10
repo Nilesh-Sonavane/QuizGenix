@@ -1,76 +1,150 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Reports')}">
 
 <head>
-    <th:block th:replace="~{base :: head}"></th:block>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-    <aside th:replace="~{base :: admin-sidebar(page='reports')}"></aside>
+    <section>
 
-    <main class="main-content">
+        <style>
+            /* --- REPORT TOOLBAR --- */
+        </style>
+
         <h1>System Reports</h1>
+        <p class="welcome-text">Generate and export detailed system analysis.</p>
 
-        <div class="report-toolbar"
-            style="display: flex; gap: 10px; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;">
-            <input type="date" class="difficulty-select">
-            <input type="date" class="difficulty-select">
-            <button class="btn-generate" style="padding: 0.5rem 1.5rem;">Export CSV</button>
+        <div class="report-toolbar">
+            <div class="date-group">
+                <span style="color: #94a3b8; font-size: 0.9rem;">From:</span>
+                <input type="date" class="date-input">
+                <span style="color: #94a3b8; font-size: 0.9rem;">To:</span>
+                <input type="date" class="date-input">
+            </div>
+            <div class="export-group">
+                <button class="btn-export">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export CSV
+                </button>
+                <button class="btn-export pdf">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Export PDF
+                </button>
+            </div>
         </div>
 
         <div class="chart-card">
             <div class="chart-header">
-                <h3>System Traffic Analysis</h3>
+                <h3>System Traffic & Revenue Analysis</h3>
             </div>
-            <div class="chart-box"><canvas id="reportChart"></canvas></div>
+            <div class="chart-box">
+                <canvas id="reportChart"></canvas>
+            </div>
         </div>
 
-        <div class="table-container" style="margin-top: 2rem;">
-            <h3>System Logs</h3>
+        <div class="logs-section">
+            <h3>Recent System Events</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Event</th>
+                        <th>Event Type</th>
                         <th>Description</th>
-                        <th>Date</th>
+                        <th>Date & Time</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>Backup</td>
-                        <td>Database Backup</td>
+                        <td>Daily Database Backup</td>
                         <td>Dec 16, 02:00 AM</td>
-                        <td>Success</td>
+                        <td><span class="status-dot dot-success"></span> Success</td>
+                    </tr>
+                    <tr>
+                        <td>Security</td>
+                        <td>Failed Login Attempt (IP: 192.168.x.x)</td>
+                        <td>Dec 15, 11:45 PM</td>
+                        <td><span class="status-dot dot-warning"></span> Flagged</td>
+                    </tr>
+                    <tr>
+                        <td>System</td>
+                        <td>Server Restart</td>
+                        <td>Dec 15, 04:00 AM</td>
+                        <td><span class="status-dot dot-success"></span> Success</td>
+                    </tr>
+                    <tr>
+                        <td>Error</td>
+                        <td>API Timeout (Quiz Generation)</td>
+                        <td>Dec 14, 09:12 PM</td>
+                        <td><span class="status-dot dot-danger"></span> Failed</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-    </main>
 
-    <div th:replace="~{base :: scripts}"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const ctx = document.getElementById('reportChart').getContext('2d');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('reportChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Revenue (₹)',
-                        data: [12000, 15000, 11000, 22000],
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                        fill: true
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
+                // Create Gradient
+                let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)'); // Purple
+                gradient.addColorStop(1, 'rgba(139, 92, 246, 0.01)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Revenue (₹)',
+                            data: [12000, 15000, 11000, 22000],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0B0E14',
+                            pointBorderColor: '#8b5cf6',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Active Users',
+                            data: [800, 950, 1100, 1250],
+                            borderColor: '#38bdf8', /* Blue */
+                            borderWidth: 3,
+                            borderDash: [5, 5], /* Dashed Line */
+                            tension: 0.4,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#94a3b8' } }
+                        },
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        }
+                    }
+                });
             });
-        });
-    </script>
+        </script>
+
+    </section>
 
 </body>
 

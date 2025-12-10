@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Users')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Payments')}">
 
 <head>
 </head>
@@ -11,9 +11,7 @@
         <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-
-
-        <h1>User Management</h1>
+        <h1>Transaction History</h1>
 
         <div class="filter-bar">
             <div class="search-box">
@@ -22,63 +20,41 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="customSearch" placeholder="Search users...">
+                <input type="text" id="customSearch" placeholder="Search ID or User...">
             </div>
 
             <select class="filter-select" id="statusFilter">
                 <option value="">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Banned">Banned</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
             </select>
 
             <select class="filter-select" id="planFilter">
                 <option value="">All Plans</option>
-                <option value="Free">Free</option>
+                <option value="Basic">Basic</option>
                 <option value="Pro">Pro</option>
+                <option value="Plus">Plus</option>
+                <option value="Premium">Premium</option>
             </select>
         </div>
 
         <div class="table-container">
-            <table id="usersTable">
+            <table id="paymentsTable">
                 <thead>
                     <tr>
-                        <th>User Details</th>
-                        <th>Role</th>
-                        <th>Joined Date</th>
+                        <th>Transaction ID</th>
+                        <th>User</th>
                         <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Date</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="avatar-sm" style="background: #8b5cf6;">JD</div>
-                                <div class="user-info">
-                                    <span>John Doe</span>
-                                    <span class="user-email">john@example.com</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>User</td>
-                        <td>Dec 10, 2024</td>
-                        <td><span class="badge bg-pro">Pro</span></td>
-                        <td><span class="badge bg-active">Active</span></td>
-                        <td>
-                            <div class="action-icons">
-                                <button class="icon-btn block" title="Block/Ban User">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
+                        <td style="font-family: monospace; color: #8b5cf6;">#TXN_192837</td>
                         <td>
                             <div class="user-cell">
                                 <div class="avatar-sm" style="background: #38bdf8;">AS</div>
@@ -88,17 +64,18 @@
                                 </div>
                             </div>
                         </td>
-                        <td>User</td>
-                        <td>Nov 05, 2024</td>
-                        <td><span class="badge" style="background: rgba(255,255,255,0.1);">Free</span></td>
-                        <td><span class="badge bg-active">Active</span></td>
+                        <td>Pro</td>
+                        <td style="font-weight: bold;">₹199</td>
+                        <td>Dec 16, 2024</td>
+                        <td><span class="badge bg-paid">Paid</span></td>
                         <td>
                             <div class="action-icons">
-                                <button class="icon-btn block" title="Block/Ban User">
+                                <button class="icon-btn" title="Download Invoice">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
                                     </svg>
                                 </button>
                             </div>
@@ -106,26 +83,57 @@
                     </tr>
 
                     <tr>
+                        <td style="font-family: monospace; color: #8b5cf6;">#TXN_192838</td>
                         <td>
                             <div class="user-cell">
-                                <div class="avatar-sm" style="background: #ef4444;">RK</div>
+                                <div class="avatar-sm" style="background: #ef4444;">JD</div>
                                 <div class="user-info">
-                                    <span>Rahul Kumar</span>
-                                    <span class="user-email">rahul@spam.com</span>
+                                    <span>John Doe</span>
+                                    <span class="user-email">john@example.com</span>
                                 </div>
                             </div>
                         </td>
-                        <td>User</td>
-                        <td>Dec 12, 2024</td>
-                        <td><span class="badge" style="background: rgba(255,255,255,0.1);">Free</span></td>
-                        <td><span class="badge bg-banned">Banned</span></td>
+                        <td>Premium</td>
+                        <td style="font-weight: bold;">₹1,499</td>
+                        <td>Dec 15, 2024</td>
+                        <td><span class="badge bg-failed">Failed</span></td>
                         <td>
                             <div class="action-icons">
-                                <button class="icon-btn" title="Unblock User">
+                                <button class="icon-btn" title="View Details">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
-                                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                                        <path d="M21 3v5h-5"></path>
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-family: monospace; color: #8b5cf6;">#TXN_192839</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-sm" style="background: #fbbf24; color: black;">RK</div>
+                                <div class="user-info">
+                                    <span>Rahul Kumar</span>
+                                    <span class="user-email">rahul@site.com</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Plus</td>
+                        <td style="font-weight: bold;">₹899</td>
+                        <td>Dec 14, 2024</td>
+                        <td><span class="badge bg-paid">Paid</span></td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn" title="Download Invoice">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
                                     </svg>
                                 </button>
                             </div>
@@ -136,22 +144,21 @@
         </div>
 
         <script>
-            // Initialize DataTables
             $(document).ready(function () {
-                var table = $('#usersTable').DataTable({
+                var table = $('#paymentsTable').DataTable({
                     "dom": 'rtip',
                     "pageLength": 10,
                     "ordering": true,
                     "language": {
-                        "info": "Showing _START_ to _END_ of _TOTAL_ users",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ transactions",
                         "paginate": { "next": ">", "previous": "<" }
                     }
                 });
 
-                // Connect Custom Inputs
+                // Connect Filters
                 $('#customSearch').on('keyup', function () { table.search(this.value).draw(); });
-                $('#statusFilter').on('change', function () { table.column(4).search(this.value).draw(); });
-                $('#planFilter').on('change', function () { table.column(3).search(this.value).draw(); });
+                $('#statusFilter').on('change', function () { table.column(5).search(this.value).draw(); }); // Status is 6th column (index 5)
+                $('#planFilter').on('change', function () { table.column(2).search(this.value).draw(); }); // Plan is 3rd column (index 2)
             });
         </script>
 

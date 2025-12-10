@@ -134,6 +134,11 @@ public class PageController {
     }
 
     // --- Admin Pages (Assuming Admin has separate security checks) ---
+    @GetMapping("/admin/")
+    public String admin() {
+        return "admin/dashboard";
+    }
+
     @GetMapping("/admin/dashboard")
     public String adminDashboard() {
         return "admin/dashboard";
@@ -144,6 +149,11 @@ public class PageController {
         return "admin/users";
     }
 
+    @GetMapping("/admin/payments")
+    public String payments() {
+        return "admin/payments";
+    }
+
     @GetMapping("/admin/quiz-logs")
     public String adminLogs() {
         return "admin/quiz-logs";
@@ -152,5 +162,14 @@ public class PageController {
     @GetMapping("/admin/reports")
     public String adminReports() {
         return "admin/reports";
+    }
+
+    @GetMapping("/admin/settings")
+    public String adminSettings(Model model, Principal principal) {
+        if (principal != null) {
+            User user = userService.findByEmail(principal.getName());
+            model.addAttribute("user", user);
+        }
+        return "admin/settings";
     }
 }

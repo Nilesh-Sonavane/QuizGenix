@@ -1,9 +1,11 @@
 package com.quizgenix.config;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -28,13 +30,19 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         String email = authentication.getName();
         User user = userService.findByEmail(email);
 
-        // 2. Check Plan Expiry Immediately
+        // 2. Check Plan Expiry Immediately (Your existing safety check)
         if (user != null) {
-            // This checks the date and downgrades to "Free" if expired
             userService.checkAndExpirePlan(user);
         }
 
-        // 3. Redirect to Dashboard (or wherever you want them to go)
-        response.sendRedirect("/dashboard");
+        // 3. Get User Roles
+        Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+
+        // 4. Redirect based on Role
+        if (roles.contains("ROLE_ADMIN")) {
+            response.sendRedirect("/admin/dashboard");
+        } else {
+            response.sendRedirect("/dashboard");
+        }
     }
 }
