@@ -5,20 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${pageTitle} + ' | QuizGenix'">QuizGenix</title>
-
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
-
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" th:href="@{/css/style.css}">
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        /* --- SIDEBAR STYLES --- */
+    </style>
 </head>
 
 <body>
 
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
+    <div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -96,34 +95,50 @@
             </a>
         </div>
         <div class="user-profile" th:unless="${user != null}">
-            <a th:href="@{/login}" class="menu-item" style="justify-content: center;">
-                <span class="menu-text">Log In</span>
-            </a>
+            <a th:href="@{/login}" class="menu-item" style="justify-content: center;"><span class="menu-text">Log
+                    In</span></a>
         </div>
     </aside>
 
-    <main class="main-content" th:insert="${content}">
+    <main class="main-content">
+        <div class="mobile-header">
+            <a th:href="@{/}" class="brand">
+                <img th:src="@{/images/logo.png}" alt="Logo">
+                <span>QuizGenix</span>
+            </a>
+            <button class="mobile-toggle-btn" onclick="openSidebar()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div th:insert="${content}"></div>
     </main>
 
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('collapsed');
-
-            // Optional: Store preference in localStorage so it remembers the state
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            localStorage.setItem('sidebarCollapsed', isCollapsed);
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
-
-        // On Load: Check if user previously collapsed the sidebar
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('mobile-active');
+            document.getElementById('backdrop').classList.add('active');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-active');
+            document.getElementById('backdrop').classList.remove('active');
+        }
         document.addEventListener('DOMContentLoaded', () => {
-            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            if (isCollapsed) {
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
                 document.getElementById('sidebar').classList.add('collapsed');
             }
         });
     </script>
-
 </body>
 
 </html>

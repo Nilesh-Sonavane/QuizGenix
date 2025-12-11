@@ -161,6 +161,53 @@ body {
 /* =========================================
    4. SIDEBAR & NAVIGATION
    ========================================= */
+/* AI Section Animations */
+@keyframes aiPulseGlow {
+    0% {
+        border-color: rgba(139, 92, 246, 0.4);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+
+    50% {
+        border-color: rgba(56, 189, 248, 0.6);
+        box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+    }
+
+    100% {
+        border-color: rgba(139, 92, 246, 0.4);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+    }
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes borderPulse {
+    0% {
+        border-color: var(--glass-border);
+    }
+
+    50% {
+        border-color: rgba(139, 92, 246, 0.6);
+    }
+
+    100% {
+        border-color: var(--glass-border);
+    }
+}
+
+/* --- SIDEBAR --- */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--sidebar-bg);
@@ -169,12 +216,13 @@ body {
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(10px);
-    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     animation: slideInLeft 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     position: relative;
     white-space: nowrap;
     z-index: 100;
     overflow-x: hidden;
+    flex-shrink: 0;
 }
 
 .sidebar.collapsed {
@@ -244,7 +292,6 @@ body {
     flex-direction: row;
 }
 
-/* Toggle Button */
 .toggle-btn {
     background: rgba(255, 255, 255, 0.1);
     border: none;
@@ -285,7 +332,6 @@ body {
     margin-top: 0;
 }
 
-/* Menu Items */
 .menu-item {
     display: flex;
     align-items: center;
@@ -357,6 +403,27 @@ body {
 }
 
 /* User Profile */
+.user-avatar-img {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    /* Prevents stretching */
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Update the existing .user-avatar to center the letter text */
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+}
+
+
 .user-profile {
     margin-top: auto;
     padding-top: 1rem;
@@ -414,46 +481,79 @@ body {
     stroke-width: 2;
 }
 
-.sidebar.collapsed .user-info,
-.sidebar.collapsed .btn-logout {
-    display: none;
-}
-
-.sidebar.collapsed:hover .user-info,
-.sidebar.collapsed:hover .btn-logout {
-    display: block;
-    animation: fadeIn 0.3s;
-}
-
-.sidebar.collapsed .user-profile {
-    justify-content: center;
-    border-top: none;
-}
-
 .sidebar.collapsed:hover .user-profile {
     justify-content: space-between;
     border-top: 1px solid var(--glass-border);
 }
 
-
-.user-avatar-img {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    /* Prevents stretching */
-    border: 2px solid rgba(255, 255, 255, 0.1);
+.backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 95;
+    backdrop-filter: blur(3px);
 }
 
-/* Update the existing .user-avatar to center the letter text */
-.user-avatar {
+.backdrop.active {
+    display: block;
+}
+
+/* --- MOBILE HEADER STYLES --- */
+.mobile-header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.mobile-toggle-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    color: white;
-    text-transform: uppercase;
+}
+
+.mobile-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media(max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 260px !important;
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+
+    .sidebar.mobile-active {
+        transform: translateX(0);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar .toggle-btn {
+        display: none;
+    }
+
+    /* Show Mobile Header */
+    .mobile-header {
+        display: flex;
+    }
 }
 
 /* =========================================
@@ -875,9 +975,100 @@ h1 {
     font-size: 0.9rem;
 }
 
+.backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 95;
+    backdrop-filter: blur(3px);
+}
+
+.backdrop.active {
+    display: block;
+}
+
+
 @media(max-width: 1024px) {
     .dashboard-split {
         grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 260px !important;
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+
+    .sidebar.mobile-active {
+        transform: translateX(0);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar .toggle-btn {
+        display: none;
+    }
+
+    .main-content {
+        padding: 1.5rem;
+    }
+
+    .mobile-header {
+        display: flex;
+    }
+
+    .ai-input-group {
+        flex-direction: column;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        gap: 12px;
+        animation: none;
+    }
+
+    .input-wrapper,
+    .ai-input {
+        width: 100%;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    .difficulty-select,
+    .questions-select,
+    .ai-input {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 14px;
+        height: 50px;
+        width: 100%;
+        color: white;
+    }
+
+    .difficulty-select:focus,
+    .questions-select:focus,
+    .ai-input:focus {
+        border-color: var(--primary);
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-generate {
+        width: 100%;
+        height: 50px;
+        justify-content: center;
+        margin-top: 5px;
     }
 }
 

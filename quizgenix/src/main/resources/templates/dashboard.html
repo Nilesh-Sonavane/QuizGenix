@@ -2,222 +2,513 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::section}, 'Dashboard')}">
 
 <head>
-    <style>
-        /* Specific Styles for Dashboard Widgets */
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            animation: slideUp 0.6s ease-out;
-        }
-
-        .welcome-text {
-            color: #94a3b8;
-            margin-bottom: 2rem;
-            animation: slideUp 0.8s ease-out;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            animation: slideUp 0.8s backwards;
-            transition: transform 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: #38bdf8;
-        }
-
-        .stat-card h3 {
-            font-size: 2rem;
-            color: #38bdf8;
-            margin-bottom: 5px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .stat-card p {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            position: relative;
-            z-index: 2;
-        }
-
-        .xp-card h3 {
-            color: #fbbf24;
-        }
-
-        .stat-card::after {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            font-size: 3.5rem;
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .stat-card:nth-child(1)::after {
-            content: '✅';
-            color: #38bdf8;
-        }
-
-        .stat-card:nth-child(2)::after {
-            content: '⚡';
-            color: #fbbf24;
-        }
-
-        .stat-card:nth-child(3)::after {
-            content: '🎯';
-            color: #22c55e;
-        }
-
-        .stat-card:nth-child(4)::after {
-            content: '🏆';
-            color: #a855f7;
-        }
-
-        .ai-section {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(56, 189, 248, 0.1));
-            border: 1px solid #8b5cf6;
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-            animation: slideUp 1s ease-out backwards;
-            animation-delay: 0.5s;
-        }
-
-        .ai-input-group {
-            display: flex;
-            align-items: center;
-            max-width: 700px;
-            margin: 1.5rem auto 0 auto;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 50px;
-            padding: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .difficulty-select,
-        .questions-select {
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            outline: none;
-            padding: 0 1rem;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            height: 100%;
-        }
-
-        .difficulty-select option,
-        .questions-select option {
-            background: #111;
-            color: white;
-        }
-
-        .ai-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 1rem;
-            outline: none;
-        }
-
-        .btn-generate {
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dashboard-split {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-
-        .topic-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.4s;
-            animation: slideUp 0.8s backwards;
-        }
-
-        .topic-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #38bdf8;
-        }
-
-        .topics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .leaderboard-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 1.5rem;
-            height: 100%;
-            animation: slideInRight 1s backwards;
-        }
-
-        .player-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .rank-badge {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.85rem;
-            background: #333;
-            color: white;
-        }
-
-        .rank-1 {
-            background: #fbbf24;
-            color: black;
-        }
-    </style>
 </head>
 
 <body>
-
     <section>
-        <h1 class="text-cap" th:text="'Hello, ' + ${user.firstName} + '! 👋'">Hello!</h1>
+        <style>
+            .main-content-inner {
+                padding-top: 0;
+            }
+
+            /* Animations */
+            @keyframes slideUp {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(30px);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes aiPulseGlow {
+                0% {
+                    border-color: rgba(139, 92, 246, 0.4);
+                    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+                }
+
+                50% {
+                    border-color: rgba(56, 189, 248, 0.6);
+                    box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
+                }
+
+                100% {
+                    border-color: rgba(139, 92, 246, 0.4);
+                    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+                }
+            }
+
+            @keyframes gradientFlow {
+                0% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            @keyframes borderPulse {
+                0% {
+                    border-color: var(--glass-border);
+                }
+
+                50% {
+                    border-color: rgba(139, 92, 246, 0.6);
+                }
+
+                100% {
+                    border-color: var(--glass-border);
+                }
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+                animation: slideUp 0.6s ease-out;
+            }
+
+            .welcome-text {
+                color: var(--text-muted);
+                margin-bottom: 2rem;
+                animation: slideUp 0.8s ease-out;
+            }
+
+            /* Stats Grid */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 3rem;
+            }
+
+            .stat-card {
+                background: var(--card-bg);
+                border: 1px solid var(--glass-border);
+                padding: 1.5rem;
+                border-radius: 15px;
+                position: relative;
+                overflow: hidden;
+                animation: slideUp 0.8s backwards;
+                transition: transform 0.3s;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                border-color: var(--accent);
+            }
+
+            .stat-card h3 {
+                font-size: 2rem;
+                color: var(--accent);
+                margin-bottom: 5px;
+                position: relative;
+                z-index: 2;
+            }
+
+            .stat-card p {
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                position: relative;
+                z-index: 2;
+            }
+
+            .xp-card h3 {
+                color: var(--gold);
+            }
+
+            .stat-card::after {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                font-size: 3.5rem;
+                opacity: 0.1;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .stat-card:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .stat-card:nth-child(1)::after {
+                content: '✅';
+                color: var(--accent);
+            }
+
+            .stat-card:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .stat-card:nth-child(2) h3 {
+                color: var(--gold);
+            }
+
+            .stat-card:nth-child(2)::after {
+                content: '⚡';
+                color: var(--gold);
+            }
+
+            .stat-card:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .stat-card:nth-child(3)::after {
+                content: '🎯';
+                color: #22c55e;
+            }
+
+            .stat-card:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            .stat-card:nth-child(4)::after {
+                content: '🏆';
+                color: #a855f7;
+            }
+
+            /* AI Section */
+            .ai-section {
+                background: linear-gradient(120deg, rgba(139, 92, 246, 0.08), rgba(56, 189, 248, 0.08), rgba(139, 92, 246, 0.08));
+                background-size: 200% 200%;
+                border: 1px solid rgba(139, 92, 246, 0.2);
+                padding: 3rem 2rem;
+                border-radius: 20px;
+                text-align: center;
+                margin-bottom: 3rem;
+                position: relative;
+                overflow: visible;
+                animation: slideUp 1s ease-out backwards, aiPulseGlow 5s ease-in-out infinite, gradientFlow 8s ease infinite;
+            }
+
+            .ai-section::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .ai-content {
+                position: relative;
+                z-index: 2;
+            }
+
+            /* AI Input Group */
+            .ai-input-group {
+                display: flex;
+                align-items: center;
+                max-width: 800px;
+                margin: 2rem auto 0 auto;
+                background: #050505;
+                border-radius: 50px;
+                padding: 6px 6px 6px 20px;
+                border: 1px solid var(--glass-border);
+                transition: transform 0.3s, box-shadow 0.3s;
+                animation: borderPulse 4s infinite;
+            }
+
+            .ai-input-group:focus-within {
+                border-color: var(--primary);
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+                animation: none;
+            }
+
+            .input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .divider {
+                width: 1px;
+                height: 24px;
+                background: rgba(255, 255, 255, 0.15);
+                margin: 0 5px;
+            }
+
+            .difficulty-select,
+            .questions-select,
+            .ai-input {
+                background: transparent;
+                color: #ccc;
+                border: none;
+                outline: none;
+                padding: 0 1rem;
+                font-weight: 500;
+                font-size: 0.95rem;
+                cursor: pointer;
+                height: 100%;
+                font-family: 'Outfit', sans-serif;
+            }
+
+            .ai-input {
+                color: white;
+                cursor: text;
+                width: 100%;
+                flex: 1;
+            }
+
+            .difficulty-select:hover,
+            .questions-select:hover {
+                color: white;
+            }
+
+            .difficulty-select option,
+            .questions-select option {
+                background: #111111;
+                color: #ffffff;
+                padding: 10px;
+            }
+
+            .btn-generate {
+                background: linear-gradient(135deg, var(--primary), #7c3aed);
+                color: white;
+                border: none;
+                padding: 0.8rem 2rem;
+                border-radius: 50px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                white-space: nowrap;
+            }
+
+            .btn-generate:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            }
+
+            /* SVG FIX for Mobile */
+            .btn-generate svg {
+                width: 18px !important;
+                height: 18px !important;
+                min-width: 18px;
+                stroke: currentColor;
+                stroke-width: 2;
+            }
+
+            /* Dashboard Split */
+            .dashboard-split {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 2rem;
+            }
+
+            .section-header {
+                margin-bottom: 1rem;
+                font-size: 1.2rem;
+            }
+
+            .topics-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .topic-card {
+                background: var(--card-bg);
+                border: 1px solid var(--glass-border);
+                padding: 1.5rem;
+                border-radius: 15px;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.4s;
+                animation: slideUp 0.8s backwards;
+            }
+
+            .topic-card:hover {
+                transform: translateY(-10px) scale(1.02);
+                border-color: var(--accent);
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .topic-icon {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .topic-name {
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
+
+            .topic-meta {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+            }
+
+            .leaderboard-box {
+                background: var(--card-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 20px;
+                padding: 1.5rem;
+                height: 100%;
+                animation: slideInRight 1s backwards;
+                animation-delay: 0.6s;
+            }
+
+            .player-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                transition: 0.2s;
+                flex-wrap: nowrap;
+            }
+
+            .player-row:hover {
+                background: rgba(255, 255, 255, 0.05);
+                padding-left: 10px;
+                padding-right: 10px;
+                border-radius: 8px;
+            }
+
+            .player-info {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                flex-direction: row;
+            }
+
+            .rank-badge {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 0.85rem;
+                background: #333;
+                color: white;
+                min-width: 28px;
+            }
+
+            .rank-1 {
+                background: var(--gold);
+                color: black;
+                box-shadow: 0 0 10px var(--gold);
+                animation: pulse 2s infinite;
+            }
+
+            .rank-2 {
+                background: #e2e8f0;
+                color: black;
+            }
+
+            .rank-3 {
+                background: #b45309;
+                color: white;
+            }
+
+            .player-score {
+                color: var(--accent);
+                font-weight: bold;
+                white-space: nowrap;
+            }
+
+            @media(max-width: 1024px) {
+                .dashboard-split {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media(max-width: 768px) {
+                .ai-input-group {
+                    flex-direction: column;
+                    background: transparent;
+                    border: none;
+                    border-radius: 0;
+                    padding: 0;
+                    gap: 12px;
+                    animation: none;
+                }
+
+                .input-wrapper,
+                .ai-input {
+                    width: 100%;
+                }
+
+                .divider {
+                    display: none;
+                }
+
+                .difficulty-select,
+                .questions-select,
+                .ai-input {
+                    background: rgba(0, 0, 0, 0.4);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 12px;
+                    padding: 14px;
+                    height: 50px;
+                    width: 100%;
+                    color: white;
+                }
+
+                .difficulty-select:focus,
+                .questions-select:focus,
+                .ai-input:focus {
+                    border-color: var(--primary);
+                    background: rgba(0, 0, 0, 0.6);
+                }
+
+                .difficulty-select:hover,
+                .questions-select:hover {
+                    color: white;
+                }
+
+                .btn-generate {
+                    width: 100%;
+                    height: 50px;
+                    justify-content: center;
+                    margin-top: 5px;
+                }
+            }
+        </style>
+
+        <h1 class="text-cap" th:text="'Hello, ' + ${user.firstName} + '! 👋'">Hello, Alex! 👋</h1>
         <p class="welcome-text">Ready to challenge your brain today?</p>
 
         <div class="stats-grid">
@@ -242,28 +533,31 @@
         <div class="ai-section">
             <div class="ai-content">
                 <h2>Generate a New Quiz</h2>
-                <p style="color: #cbd5e1; margin-top: 0.5rem;">Enter any topic, skill, or concept.</p>
+                <p style="color: #94a3b8; margin-top: 0.5rem;">Enter any topic, skill, or concept.</p>
 
-                <div class="ai-input-group">
-                    <select class="difficulty-select">
-                        <option value="easy" selected>Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                        <option value="expert">Expert</option>
-                    </select>
-
-                    <select class="questions-select">
-                        <option value="10">10 Qs</option>
-                        <option value="25">25 Qs</option>
-                        <option value="50">50 Qs</option>
-                        <option value="100">100 Qs</option>
-                    </select>
-
+                <form class="ai-input-group">
+                    <div class="input-wrapper">
+                        <select class="difficulty-select">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="input-wrapper">
+                        <select class="questions-select">
+                            <option value="10">10 Qs</option>
+                            <option value="25">25 Qs</option>
+                            <option value="50">50 Qs</option>
+                        </select>
+                    </div>
+                    <div class="divider"></div>
                     <input type="text" class="ai-input" placeholder="e.g., 'Spring Boot Security'">
 
-                    <button class="btn-generate">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                            stroke-linejoin="round">
+                    <button type="button" class="btn-generate">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <path
                                 d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
                             </path>
@@ -272,71 +566,95 @@
                         </svg>
                         Generate
                     </button>
-                </div>
+                </form>
             </div>
         </div>
 
         <div class="dashboard-split">
             <div>
-                <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Popular Topics</h3>
+                <h3 class="section-header">Popular Topics</h3>
                 <div class="topics-grid">
                     <div class="topic-card">
-                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">☕</div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem;">Java Basics</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">15 Questions • Easy</div>
+                        <div class="topic-icon">☕</div>
+                        <div class="topic-name">Java Basics</div>
+                        <div class="topic-meta">15 Questions • Easy</div>
                     </div>
                     <div class="topic-card">
-                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">🐍</div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem;">Python Data</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">20 Questions • Medium</div>
+                        <div class="topic-icon">🐍</div>
+                        <div class="topic-name">Python Data</div>
+                        <div class="topic-meta">20 Questions • Medium</div>
                     </div>
                     <div class="topic-card">
-                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">⚛️</div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem;">React JS</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">10 Questions • Hard</div>
+                        <div class="topic-icon">⚛️</div>
+                        <div class="topic-name">React JS</div>
+                        <div class="topic-meta">10 Questions • Hard</div>
                     </div>
                     <div class="topic-card">
-                        <div style="font-size: 1.5rem; margin-bottom: 1rem;">🗄️</div>
-                        <div style="font-weight: bold; margin-bottom: 0.5rem;">SQL Queries</div>
-                        <div style="font-size: 0.8rem; color: #94a3b8;">12 Questions • Medium</div>
+                        <div class="topic-icon">🗄️</div>
+                        <div class="topic-name">SQL Queries</div>
+                        <div class="topic-meta">12 Questions • Medium</div>
                     </div>
                 </div>
             </div>
 
             <div>
-                <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Top Players 🏆</h3>
+                <h3 class="section-header">Top Players 🏆</h3>
                 <div class="leaderboard-box">
                     <div class="player-row">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="rank-badge rank-1">1</div>
-                            <span style="font-weight: 500; font-size: 0.95rem;">Sarah_Codes</span>
-                        </div>
-                        <span style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;">2,450 XP</span>
+                        <div class="player-info">
+                            <div class="rank-badge rank-1">1</div><span class="player-name">Sarah_Codes</span>
+                        </div><span class="player-score">2,450 XP</span>
                     </div>
                     <div class="player-row">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="rank-badge" style="background:#e2e8f0; color:black;">2</div>
-                            <span style="font-weight: 500; font-size: 0.95rem;">Dev_Master</span>
-                        </div>
-                        <span style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;">2,100 XP</span>
+                        <div class="player-info">
+                            <div class="rank-badge rank-2">2</div><span class="player-name">Dev_Master</span>
+                        </div><span class="player-score">2,100 XP</span>
                     </div>
                     <div class="player-row">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="rank-badge" style="background:#b45309; color:white;">3</div>
-                            <span style="font-weight: 500; font-size: 0.95rem;">BugHunter</span>
-                        </div>
-                        <span style="color: #38bdf8; font-weight: bold; font-size: 0.9rem;">1,950 XP</span>
+                        <div class="player-info">
+                            <div class="rank-badge rank-3">3</div><span class="player-name">BugHunter</span>
+                        </div><span class="player-score">1,950 XP</span>
                     </div>
-                    <div style="text-align: center; margin-top: 1rem;">
-                        <a th:href="@{/leaderboard}"
-                            style="color: #94a3b8; font-size: 0.85rem; text-decoration: none;">View Full Leaderboard
-                            →</a>
+                    <div class="player-row">
+                        <div class="player-info">
+                            <div class="rank-badge">4</div><span class="player-name">CodeNinja</span>
+                        </div><span class="player-score">1,800 XP</span>
                     </div>
+                    <div class="player-row">
+                        <div class="player-info">
+                            <div class="rank-badge">5</div><span class="player-name">ReactPro</span>
+                        </div><span class="player-score">1,600 XP</span>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;"><a href="#"
+                            style="color: var(--text-muted); font-size: 0.85rem; text-decoration: none;">View Full
+                            Leaderboard →</a></div>
                 </div>
             </div>
         </div>
-    </section>
 
+        <script>
+            /* --- TYPEWRITER ANIMATION LOGIC --- */
+            const placeholders = ["e.g., 'Spring Boot Security'", "e.g., 'React Hooks & Context'", "e.g., 'Python Data Science'", "e.g., 'Advanced SQL Joins'", "e.g., 'System Design Patterns'"];
+            const inputField = document.querySelector('.ai-input');
+            let index = 0; let charIndex = 0; let isDeleting = false; let typeSpeed = 100;
+
+            function typeEffect() {
+                if (!inputField) return;
+                const currentText = placeholders[index];
+                let displayText = currentText.substring(0, charIndex);
+                if (charIndex < currentText.length || isDeleting) { displayText += '|'; }
+                inputField.setAttribute('placeholder', displayText);
+
+                if (isDeleting) { charIndex--; typeSpeed = 50; } else { charIndex++; typeSpeed = 100; }
+
+                if (!isDeleting && charIndex === currentText.length + 1) { isDeleting = true; typeSpeed = 2000; }
+                else if (isDeleting && charIndex === 0) { isDeleting = false; index = (index + 1) % placeholders.length; typeSpeed = 500; }
+
+                setTimeout(typeEffect, typeSpeed);
+            }
+            document.addEventListener('DOMContentLoaded', typeEffect);
+        </script>
+    </section>
 </body>
 
 </html>
