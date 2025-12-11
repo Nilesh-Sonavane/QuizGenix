@@ -613,18 +613,25 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> 5 Quizzes / Month</li>
+                    </svg>
+                    <strong>10 Quizzes</strong> / Month
+                </li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> Standard Topics</li>
+                    </svg>
+                    Standard Difficulty
+                </li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    7-Day History Access
+                </li>
                 <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg> Advanced AI Mode</li>
-                <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg> Progress Analytics</li>
+                    </svg>
+                    Detailed Explanations
+                </li>
             </ul>
             <button class="btn-plan" onclick="handleFreePlan()"
                 th:classappend="${isLoggedIn and activePlanRank == 0} ? 'active-plan' : ''"
@@ -640,10 +647,25 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> Unlimited Quizzes</li>
+                    </svg>
+                    <strong>Unlimited</strong> Quizzes
+                </li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> Detailed Analytics</li>
+                    </svg>
+                    Detailed Answer Logic
+                </li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Unlock "Hard" Difficulty
+                </li>
+                <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    PDF Downloads
+                </li>
             </ul>
 
             <button class="btn-plan" th:onclick="'startPayment(' + ${costMonthly} + ', \'Monthly Plan\')'"
@@ -662,10 +684,19 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> Everything in Pro</li>
+                    </svg>
+                    Everything in Pro
+                </li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> Priority Support</li>
+                    </svg>
+                    Unlimited History
+                </li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Download Quizzes as PDF
+                </li>
             </ul>
 
             <button class="btn-plan" th:onclick="'startPayment(' + ${cost6Month} + ', \'6-Month Plan\')'"
@@ -684,10 +715,19 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> All Plus Features</li>
+                    </svg>
+                    All Plus Features
+                </li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg> Team Leaderboards</li>
+                    </svg>
+                    Completion Certificates
+                </li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Priority Server Access
+                </li>
             </ul>
 
             <button class="btn-plan btn-featured" th:onclick="'startPayment(' + ${costYearly} + ', \'Yearly Plan\')'"
