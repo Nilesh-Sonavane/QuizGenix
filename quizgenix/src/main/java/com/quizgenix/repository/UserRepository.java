@@ -1,6 +1,10 @@
 package com.quizgenix.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.quizgenix.model.User;
 
@@ -17,4 +21,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Check if email exists (Optional, but good for validation)
     boolean existsByEmail(String email);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.totalXp > :xp")
+    long countUsersWithMoreXp(@Param("xp") int totalXp);
+
+    List<User> findTop5ByOrderByTotalXpDesc();
 }

@@ -3,6 +3,7 @@ package com.quizgenix.service;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects; // Required Import
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,9 +21,6 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // ============================================================
-    // 1. REGISTRATION VERIFICATION EMAIL
-    // ============================================================
     public void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
         String toAddress = user.getEmail();
@@ -44,9 +42,6 @@ public class EmailService {
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
-    // ============================================================
-    // 2. FORGOT PASSWORD EMAIL
-    // ============================================================
     public void sendResetPasswordEmail(User user, String resetURL)
             throws MessagingException, UnsupportedEncodingException {
 
@@ -68,9 +63,6 @@ public class EmailService {
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
-    // ============================================================
-    // 3. PAYMENT SUCCESS EMAIL (DYNAMIC DATA)
-    // ============================================================
     public void sendPaymentSuccessEmail(String toAddress, String name, String paymentId, String amount, String planName)
             throws MessagingException, UnsupportedEncodingException {
 
@@ -79,12 +71,8 @@ public class EmailService {
         String subject = "Payment Receipt - " + planName;
 
         String displayName = capitalize(name);
-
-        // Get Current Date (e.g., "07 Dec 2025")
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
 
-        // Build the inner HTML body with DYNAMIC VARIABLES
-        // Using inline CSS to ensure it renders correctly in Gmail/Outlook
         String messageBody = "Your subscription to the <strong>" + planName
                 + "</strong> is successfully confirmed.<br><br>" +
                 "Here are your transaction details:<br><br>" +
@@ -107,15 +95,11 @@ public class EmailService {
                 "Hello, " + displayName,
                 messageBody,
                 "Go to Dashboard",
-                "http://localhost:8080/dashboard" // Update this for production
-        );
+                "http://localhost:8080/dashboard");
 
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
-    // ============================================================
-    // HELPER METHODS
-    // ============================================================
     private String capitalize(String str) {
         if (str == null || str.isEmpty())
             return str;
@@ -124,12 +108,16 @@ public class EmailService {
 
     private void sendEmail(String to, String from, String senderName, String subject, String content)
             throws MessagingException, UnsupportedEncodingException {
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
-        helper.setFrom(from, senderName);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(content, true);
+
+        // FIX: Wrap ALL parameters to satisfy strict null analysis
+        helper.setFrom(Objects.requireNonNull(from), Objects.requireNonNull(senderName));
+        helper.setTo(Objects.requireNonNull(to));
+        helper.setSubject(Objects.requireNonNull(subject));
+        helper.setText(Objects.requireNonNull(content), true);
+
         mailSender.send(message);
     }
 

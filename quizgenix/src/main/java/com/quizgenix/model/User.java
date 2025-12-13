@@ -54,6 +54,13 @@ public class User {
     @Column(name = "token_creation_date")
     private LocalDateTime tokenCreationDate; // New field for expiration
 
+    // --- NEW FIELD: TOTAL XP ---
+    @Column(columnDefinition = "int default 0")
+    private int totalXp = 0; // Stores the user's total experience points
+
+    public int getLevel() {
+        return (this.totalXp / 1000) + 1;
+    }
     // --- SUBSCRIPTION FIELDS ---
 
     // Default to "Free"

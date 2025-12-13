@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Quiz Result | QuizGenix</title>
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        /* --- THEME --- */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #6366f1;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --xp-gold: #fbbf24;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .result-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100%;
+            max-width: 420px;
+            padding: 3rem 2rem;
+            border-radius: 32px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- XP BADGE --- */
+        .xp-badge {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.2));
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: var(--xp-gold);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+            animation: pulseXP 2s infinite;
+        }
+
+        @keyframes pulseXP {
+            0% {
+                box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(251, 191, 36, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+            }
+        }
+
+        /* --- CIRCULAR PROGRESS --- */
+        .progress-wrapper {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+
+        .bg-circle {
+            stroke: rgba(255, 255, 255, 0.05);
+        }
+
+        .fg-circle {
+            stroke: var(--primary);
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-big {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+            color: white;
+        }
+
+        .score-small {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        p.desc {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="result-card">
+
+        <div th:with="percent=${(score * 100.0) / total}, 
+                      multiplier=${quiz.difficulty == 'Hard' ? 3 : (quiz.difficulty == 'Medium' ? 2 : 1)}, 
+                      xpEarned=${score * multiplier}">
+
+            <div class="xp-badge" th:if="${score > 0}">
+                <span>⚡</span>
+                <span th:text="'+' + ${xpEarned} + ' XP Earned'">+5 XP Earned</span>
+            </div>
+
+            <div class="progress-wrapper">
+                <svg class="progress-circle" viewBox="0 0 160 160">
+                    <circle class="bg-circle" cx="80" cy="80" r="70"></circle>
+                    <circle class="fg-circle" id="score-circle" cx="80" cy="80" r="70"></circle>
+                </svg>
+                <div class="score-text">
+                    <div class="score-big" th:text="${#numbers.formatDecimal(percent, 0, 0)} + '%'">80%</div>
+                    <div class="score-small" th:text="${score} + ' / ' + ${total}">8/10</div>
+                </div>
+            </div>
+
+            <div th:if="${percent >= 80}">
+                <h1>Mastery! 🏆</h1>
+                <p class="desc">You are unstoppable! Keep up the streak.</p>
+                <script>document.documentElement.style.setProperty('--primary', '#22c55e');</script>
+            </div>
+
+            <div th:if="${percent >= 50 and percent < 80}">
+                <h1>Well Done! 👏</h1>
+                <p class="desc">Good job! You're getting better every day.</p>
+            </div>
+
+            <div th:if="${percent < 50}">
+                <h1>Don't Give Up! 💪</h1>
+                <p class="desc">Review the answers and try again. You got this!</p>
+                <script>document.documentElement.style.setProperty('--primary', '#ef4444');</script>
+            </div>
+
+            <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+
+            <script th:inline="javascript">
+                document.addEventListener("DOMContentLoaded", () => {
+                    const percent = /*[[${(score * 100.0) / total}]]*/ 0;
+                    const circle = document.getElementById('score-circle');
+                    const circumference = 2 * Math.PI * 70; // ~440
+                    const offset = circumference - (percent / 100) * circumference;
+                    setTimeout(() => { circle.style.strokeDashoffset = offset; }, 300);
+                });
+            </script>
+        </div>
+    </div>
+
+</body>
+
+</html>

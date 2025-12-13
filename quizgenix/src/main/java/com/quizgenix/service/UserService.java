@@ -2,6 +2,7 @@ package com.quizgenix.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects; // Import Objects
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,100 +29,70 @@ public class UserService {
 
     private static final long EXPIRE_TOKEN_AFTER_MINUTES = 30;
 
-    // ========================================================================
-    // 1. REGISTRATION LOGIC (First User = ADMIN & ENABLED)
-    // ========================================================================
+    // ... (Your existing methods remain the same) ...
+    // Copy content from previous file...
+    // The only change is in the save() method below:
 
     public void register(User user, String siteURL) throws Exception {
-        // 1. Check if email exists
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new Exception("There is already an account registered with the email " + user.getEmail());
         }
-
-        // 2. Encode Password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // 3. ASSIGN ROLE & STATUS
         if (userRepository.count() == 0) {
-            // FIRST USER: Admin and Active immediately
             user.setRole("ADMIN");
             user.setEnabled(true);
         } else {
-            // OTHER USERS: Regular User and Disabled (must verify email)
             user.setRole("USER");
             user.setEnabled(false);
         }
-
-        // 4. Generate Verification Code (Needed for regular users)
         String randomCode = UUID.randomUUID().toString();
         user.setVerificationCode(randomCode);
-
-        // --- SET DEFAULT FREE PLAN (Logic Added Here) ---
         user.setActivePlan("Free");
         user.setCurrentPlanPrice(0.0);
         user.setPlanStartDate(LocalDateTime.now());
-        user.setPlanExpiryDate(null); // Null implies forever free until upgrade
+        user.setPlanExpiryDate(null);
 
-        // 5. Save User
         userRepository.save(user);
 
-        // 6. Send Verification Email (ONLY if the user is NOT enabled)
-        // We don't send this email to the Admin since they are already active.
         if (!user.isEnabled()) {
             emailService.sendVerificationEmail(user, siteURL);
         }
     }
 
-    // ========================================================================
-    // 2. HELPER METHODS (Required by PaymentController)
-    // ========================================================================
-
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    // Inside public void save(User user)
     public void save(User user) {
-        userRepository.save(user);
+        // FIX: Ensure User is not null
+        userRepository.save(Objects.requireNonNull(user, "User cannot be null"));
     }
-
-    // ========================================================================
-    // 3. EMAIL VERIFICATION LOGIC
-    // ========================================================================
 
     public boolean verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
-
         if (user == null || user.isEnabled()) {
             return false;
         } else {
-            user.setVerificationCode(null); // Clear code after use
-            user.setEnabled(true); // Enable the account
+            user.setVerificationCode(null);
+            user.setEnabled(true);
             userRepository.save(user);
             return true;
         }
     }
 
-    // ========================================================================
-    // 4. FORGOT PASSWORD LOGIC (Token Generation)
-    // ========================================================================
-
     public String updateResetPasswordToken(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
-
         if (user != null) {
             String token = UUID.randomUUID().toString();
             user.setResetPasswordToken(token);
-            user.setTokenCreationDate(LocalDateTime.now()); // Capture timestamp
+            user.setTokenCreationDate(LocalDateTime.now());
             userRepository.save(user);
             return token;
         } else {
             throw new UsernameNotFoundException("Could not find any customer with the email " + email);
         }
     }
-
-    // ========================================================================
-    // 5. FORGOT PASSWORD LOGIC (Validation & Update)
-    // ========================================================================
 
     public User getByResetPasswordToken(String token) {
         return userRepository.findByResetPasswordToken(token);
@@ -130,14 +101,11 @@ public class UserService {
     public void updatePassword(User user, String newPassword) {
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);
-
         user.setResetPasswordToken(null);
         user.setTokenCreationDate(null);
-
         userRepository.save(user);
     }
 
-    // Check if token is older than 30 minutes
     public boolean isTokenExpired(LocalDateTime tokenCreationDate) {
         if (tokenCreationDate == null) {
             return true;
@@ -147,20 +115,12 @@ public class UserService {
         return diff.toMinutes() >= EXPIRE_TOKEN_AFTER_MINUTES;
     }
 
-    /**
-     * Checks if the user's plan has expired.
-     * If expired, downgrades to Free plan and updates DB.
-     */
     public User checkAndExpirePlan(User user) {
         if (user.getPlanExpiryDate() != null && LocalDateTime.now().isAfter(user.getPlanExpiryDate())) {
-
-            // Plan has expired: Downgrade logic
             user.setActivePlan("Free");
             user.setCurrentPlanPrice(0.0);
-            user.setPlanExpiryDate(null); // Or set to past date if you track history
+            user.setPlanExpiryDate(null);
             user.setPlanStartDate(null);
-
-            // Save changes to DB
             return userRepository.save(user);
         }
         return user;
