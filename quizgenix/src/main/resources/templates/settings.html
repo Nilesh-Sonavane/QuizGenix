@@ -7,7 +7,199 @@
 <body>
 
     <section>
+        <style>
+            /* --- LOADER CSS (Yours) --- */
+            .loader-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(11, 14, 20, 0.8);
+                backdrop-filter: blur(8px);
+                z-index: 20000;
+                /* Increased to sit above modals */
+                display: none;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .spinner {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: conic-gradient(#0000 10%, #8b5cf6, #38bdf8);
+                /* Used variables as hex for safety */
+                -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+                mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+                animation: spin 1.2s infinite linear;
+                border: none;
+            }
+
+            .loading-text {
+                color: white;
+                font-family: 'Outfit', sans-serif;
+                font-weight: 500;
+                font-size: 1rem;
+                letter-spacing: 1px;
+                text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+                animation: pulse 2s infinite ease-in-out;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(1turn);
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            /* --- MODAL CSS --- */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.85);
+                z-index: 10000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+                animation: fadeIn 0.3s ease-out;
+                padding: 20px;
+            }
+
+            .modal-box {
+                background: #1e293b;
+                border: 1px solid rgba(139, 92, 246, 0.3);
+                padding: 2.5rem;
+                border-radius: 20px;
+                text-align: center;
+                max-width: 400px;
+                width: 100%;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+                transform: scale(0.9);
+                animation: popIn 0.3s ease-out forwards;
+            }
+
+            .modal-icon {
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.5rem auto;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                color: white;
+            }
+
+            .modal-text {
+                color: #94a3b8;
+                margin-bottom: 2rem;
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            .btn-modal {
+                background: #8b5cf6;
+                color: white;
+                border: none;
+                padding: 0.8rem 2rem;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: 0.2s;
+                width: 100%;
+                font-size: 1rem;
+            }
+
+            .btn-modal:hover {
+                background: #7c3aed;
+                transform: translateY(-2px);
+            }
+
+            .btn-danger-confirm {
+                background: #ef4444;
+                margin-top: 10px;
+            }
+
+            .btn-danger-confirm:hover {
+                background: #dc2626;
+            }
+
+            .btn-secondary {
+                background: #334155;
+                margin-top: 10px;
+            }
+
+            .btn-secondary:hover {
+                background: #475569;
+            }
+
+            .otp-input {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                border: 1px solid #475569;
+                background: #0f172a;
+                color: white;
+                text-align: center;
+                letter-spacing: 5px;
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes popIn {
+                from {
+                    transform: scale(0.8);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+        </style>
+
         <h1>Settings</h1>
+
+        <input type="hidden" id="serverSuccessMessage" th:value="${success}" />
+        <input type="hidden" id="serverErrorMessage" th:value="${error}" />
+
+        <div th:if="${error}"
+            style="color: #ef4444; margin-bottom: 15px; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px;"
+            th:text="${error}"></div>
 
         <div class="settings-grid">
 
@@ -17,21 +209,26 @@
                     <p>Update your photo and personal details here.</p>
                 </div>
 
-                <form th:action="@{/update-profile}" method="post">
+                <form id="profileForm" th:action="@{/update-profile}" method="post" enctype="multipart/form-data"
+                    onsubmit="showLoader()">
 
                     <div class="profile-section">
                         <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                            th:src="@{'/images/' + ${user.profileImage}}" class="big-avatar" style="object-fit: cover;"
-                            alt="Profile Photo">
+                            th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : '/user-photos/' + user.profileImage}"
+                            class="big-avatar" style="object-fit: cover;" id="avatarPreview" alt="Profile Photo">
 
                         <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                            class="big-avatar"
+                            class="big-avatar" id="avatarPlaceholder"
                             style="display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; font-weight: 700;">
                             <span th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</span>
                         </div>
 
                         <div>
-                            <button type="button" class="upload-btn">Change Photo</button>
+                            <input type="file" id="profileImageInput" name="profileImage"
+                                accept="image/png, image/jpeg, image/jpg" style="display: none;"
+                                onchange="previewImage(this)">
+                            <button type="button" class="upload-btn"
+                                onclick="document.getElementById('profileImageInput').click()">Change Photo</button>
                             <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;">JPG or PNG, max 2MB</p>
                         </div>
                     </div>
@@ -58,52 +255,157 @@
                 </form>
             </div>
 
-            <div class="settings-card">
-                <div class="card-header">
-                    <h3>Preferences</h3>
-                    <p>Manage your notifications and app appearance.</p>
-                </div>
-
-                <div class="toggle-row">
-                    <span>Email Notifications</span>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-row">
-                    <span>Public Profile</span>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-row">
-                    <span>Sound Effects</span>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
             <div class="settings-card" style="border-color: rgba(239, 68, 68, 0.3);">
                 <div class="card-header" style="border-color: rgba(239, 68, 68, 0.1);">
                     <h3 style="color: #ef4444;">Danger Zone</h3>
                     <p>Once you delete your account, there is no going back.</p>
                 </div>
-                <button class="btn-danger" onclick="confirmDelete()">Delete Account</button>
+                <button class="btn-danger" onclick="openDeleteModal()">Delete Account</button>
             </div>
+        </div>
 
+        <div id="delete-modal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-icon" style="background: rgba(239, 68, 68, 0.1);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round" style="color: #ef4444;">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                        </path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <h3 class="modal-title" style="color: #ef4444;">Are you sure?</h3>
+                <p class="modal-text">This will permanently delete your quizzes, history, and profile image.</p>
+
+                <div id="step-send-otp">
+                    <button onclick="sendDeleteOtp()" class="btn-modal" id="btn-send-otp">Send Verification
+                        Code</button>
+                    <button onclick="closeDeleteModal()" class="btn-modal btn-secondary">Cancel</button>
+                </div>
+
+                <div id="step-verify-otp" style="display: none;">
+                    <form th:action="@{/verify-delete-account}" method="post" onsubmit="showLoader()">
+                        <p class="modal-text" style="font-size: 0.8rem; margin-bottom: 10px;">Enter the code sent to
+                            your email</p>
+                        <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" required
+                            autocomplete="off">
+                        <button type="submit" class="btn-modal btn-danger-confirm">Verify & Delete</button>
+                    </form>
+                    <button onclick="closeDeleteModal()" class="btn-modal btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-modal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h3 class="modal-title">Success!</h3>
+                <p class="modal-text" id="modal-message-text">Operation completed successfully.</p>
+                <button onclick="closeSuccessModal()" class="btn-modal">Great!</button>
+            </div>
+        </div>
+
+        <div id="global-loader" class="loader-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Processing...</div>
         </div>
 
         <script>
-            function confirmDelete() {
-                if (confirm("Are you sure you want to delete your account? This cannot be undone.")) {
-                    // Call delete API
-                    window.location.href = "/delete-account";
+            // --- LOADER FUNCTIONS ---
+            function showLoader() {
+                document.getElementById('global-loader').style.display = 'flex';
+            }
+
+            function hideLoader() {
+                document.getElementById('global-loader').style.display = 'none';
+            }
+
+            // --- DELETE MODAL LOGIC ---
+            function openDeleteModal() {
+                document.getElementById('delete-modal').style.display = 'flex';
+                document.getElementById('step-send-otp').style.display = 'block';
+                document.getElementById('step-verify-otp').style.display = 'none';
+            }
+
+            function closeDeleteModal() {
+                document.getElementById('delete-modal').style.display = 'none';
+            }
+
+            function sendDeleteOtp() {
+                const btn = document.getElementById('btn-send-otp');
+
+                // 1. Show Loader
+                showLoader();
+
+                // 2. CSRF Fix: Attempt to find the hidden CSRF input automatically
+                // This input is usually injected by Thymeleaf into the first form it sees
+                const csrfInput = document.querySelector('input[name="_csrf"]');
+                const csrfToken = csrfInput ? csrfInput.value : '';
+
+                const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                if (csrfToken) {
+                    // Standard Spring Security header
+                    headers['X-CSRF-TOKEN'] = csrfToken;
+                }
+
+                fetch('/send-delete-otp', {
+                    method: 'POST',
+                    headers: headers
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Server rejected request");
+                        return response.text();
+                    })
+                    .then(data => {
+                        // 3. Hide Loader
+                        hideLoader();
+
+                        if (data === 'sent') {
+                            document.getElementById('step-send-otp').style.display = 'none';
+                            document.getElementById('step-verify-otp').style.display = 'block';
+                        } else {
+                            alert("Error sending email. Please try again.");
+                        }
+                    })
+                    .catch(err => {
+                        // 3. Hide Loader on Error
+                        hideLoader();
+                        console.error(err);
+                        alert("Could not connect to server. Check console.");
+                    });
+            }
+
+            // --- IMAGE PREVIEW ---
+            function previewImage(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var img = document.getElementById('avatarPreview');
+                        if (img) img.src = e.target.result;
+                    }
+                    reader.readAsDataURL(input.files[0]);
                 }
             }
+
+            // --- SUCCESS MODAL ---
+            function closeSuccessModal() {
+                document.getElementById('success-modal').style.display = 'none';
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                var successInput = document.getElementById('serverSuccessMessage');
+                if (successInput && successInput.value.trim() !== "") {
+                    document.getElementById('modal-message-text').innerText = successInput.value;
+                    document.getElementById('success-modal').style.display = 'flex';
+                }
+            });
         </script>
 
     </section>

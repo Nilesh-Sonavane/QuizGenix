@@ -26,4 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countUsersWithMoreXp(@Param("xp") int totalXp);
 
     List<User> findTop5ByOrderByTotalXpDesc();
+
+    // Fetch top 20 for the full leaderboard page
+    List<User> findTop20ByOrderByTotalXpDesc();
 }

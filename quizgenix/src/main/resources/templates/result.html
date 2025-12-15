@@ -1,25 +1,24 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Result | QuizGenix</title>
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- THEME --- */
         :root {
             --bg-dark: #0f172a;
             --bg-card: #1e293b;
             --primary: #6366f1;
+            --primary-hover: #4f46e5;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
             --success: #22c55e;
-            --warning: #eab308;
             --danger: #ef4444;
-            --xp-gold: #fbbf24;
+            --warning: #eab308;
         }
 
         * {
@@ -31,176 +30,148 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            background-image: radial-gradient(circle at top center, #1e293b 0%, #0f172a 60%);
         }
 
         .result-card {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            width: 100%;
-            max-width: 420px;
-            padding: 3rem 2rem;
-            border-radius: 32px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             position: relative;
+            overflow: hidden;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* --- XP BADGE --- */
-        .xp-badge {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.2));
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            color: var(--xp-gold);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
-            animation: pulseXP 2s infinite;
-        }
-
-        @keyframes pulseXP {
-            0% {
-                box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(251, 191, 36, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-            }
-        }
-
-        /* --- CIRCULAR PROGRESS --- */
-        .progress-wrapper {
-            position: relative;
-            width: 160px;
-            height: 160px;
-            margin: 0 auto 2rem auto;
-        }
-
-        .progress-circle {
-            transform: rotate(-90deg);
+        /* Confetti Background Effect */
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .progress-circle circle {
-            fill: none;
-            stroke-width: 12;
-            stroke-linecap: round;
+        .content {
+            position: relative;
+            z-index: 1;
         }
 
-        .bg-circle {
-            stroke: rgba(255, 255, 255, 0.05);
+        .xp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: var(--warning);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.1);
         }
 
-        .fg-circle {
-            stroke: var(--primary);
-            stroke-dasharray: 440;
-            stroke-dashoffset: 440;
-            transition: stroke-dashoffset 1.5s ease-out;
-        }
-
-        .score-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem auto;
+            border: 4px solid var(--border);
+            position: relative;
         }
 
-        .score-big {
-            font-size: 3rem;
+        /* Color Borders based on score */
+        .score-circle.high {
+            border-color: var(--success);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .score-circle.mid {
+            border-color: var(--warning);
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
+        }
+
+        .score-circle.low {
+            border-color: var(--danger);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .score-text {
+            font-size: 2.5rem;
             font-weight: 800;
-            line-height: 1;
             color: white;
+            line-height: 1;
         }
 
-        .score-small {
-            font-size: 0.9rem;
+        .score-sub {
+            font-size: 0.85rem;
             color: var(--text-muted);
-            margin-top: 5px;
+            margin-top: 4px;
             font-weight: 500;
         }
 
-        h1 {
-            font-size: 2rem;
+        .title {
+            font-size: 1.75rem;
             font-weight: 700;
+            color: white;
             margin-bottom: 0.5rem;
-            color: white;
         }
 
-        p.desc {
+        .subtitle {
             color: var(--text-muted);
+            font-size: 0.95rem;
             margin-bottom: 2.5rem;
-            font-size: 1.05rem;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        /* --- BUTTONS --- */
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .btn-dashboard {
+            display: block;
             width: 100%;
-            padding: 16px;
-            border-radius: 16px;
-            font-weight: 600;
-            font-size: 1rem;
+            padding: 14px;
+            background: var(--success);
+            color: #0f172a;
             text-decoration: none;
-            margin-bottom: 12px;
-            transition: 0.2s;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: #4f46e5;
+        .btn-dashboard:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.4);
         }
 
-        .btn-outline {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-        }
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
 
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -208,55 +179,33 @@
 <body>
 
     <div class="result-card">
-
-        <div th:with="percent=${(score * 100.0) / total}, 
-                      multiplier=${quiz.difficulty == 'Hard' ? 3 : (quiz.difficulty == 'Medium' ? 2 : 1)}, 
-                      xpEarned=${score * multiplier}">
-
-            <div class="xp-badge" th:if="${score > 0}">
+        <div class="content">
+            <div class="xp-badge">
                 <span>⚡</span>
-                <span th:text="'+' + ${xpEarned} + ' XP Earned'">+5 XP Earned</span>
+                <span th:with="diff=${quiz.difficulty}, 
+                               baseXp=${#strings.equalsIgnoreCase(diff, 'Hard') ? 20 : (#strings.equalsIgnoreCase(diff, 'Medium') ? 15 : 10)},
+                               correctCount=${(score * total) / 100.0}">
+                    +<span th:text="${T(java.lang.Math).round(correctCount * baseXp)}">0</span> XP Earned
+                </span>
             </div>
 
-            <div class="progress-wrapper">
-                <svg class="progress-circle" viewBox="0 0 160 160">
-                    <circle class="bg-circle" cx="80" cy="80" r="70"></circle>
-                    <circle class="fg-circle" id="score-circle" cx="80" cy="80" r="70"></circle>
-                </svg>
-                <div class="score-text">
-                    <div class="score-big" th:text="${#numbers.formatDecimal(percent, 0, 0)} + '%'">80%</div>
-                    <div class="score-small" th:text="${score} + ' / ' + ${total}">8/10</div>
-                </div>
+            <div class="score-circle" th:classappend="${score >= 80 ? 'high' : (score >= 50 ? 'mid' : 'low')}">
+                <div class="score-text" th:text="${score} + '%'">0%</div>
+                <div class="score-sub" th:text="${T(java.lang.Math).round((score * total) / 100.0)} + ' / ' + ${total}">
+                    0 / 10</div>
             </div>
 
-            <div th:if="${percent >= 80}">
-                <h1>Mastery! 🏆</h1>
-                <p class="desc">You are unstoppable! Keep up the streak.</p>
-                <script>document.documentElement.style.setProperty('--primary', '#22c55e');</script>
-            </div>
+            <h1 class="title"
+                th:text="${score >= 80 ? 'Mastery! 🏆' : (score >= 50 ? 'Good Job! 👏' : 'Keep Learning! 📚')}">
+                Result
+            </h1>
 
-            <div th:if="${percent >= 50 and percent < 80}">
-                <h1>Well Done! 👏</h1>
-                <p class="desc">Good job! You're getting better every day.</p>
-            </div>
+            <p class="subtitle"
+                th:text="${score >= 80 ? 'You are unstoppable! Keep up the streak.' : (score >= 50 ? 'Solid performance. A little more practice and you will master it.' : 'Do not give up. Review your answers and try again!')}">
+                Message...
+            </p>
 
-            <div th:if="${percent < 50}">
-                <h1>Don't Give Up! 💪</h1>
-                <p class="desc">Review the answers and try again. You got this!</p>
-                <script>document.documentElement.style.setProperty('--primary', '#ef4444');</script>
-            </div>
-
-            <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
-
-            <script th:inline="javascript">
-                document.addEventListener("DOMContentLoaded", () => {
-                    const percent = /*[[${(score * 100.0) / total}]]*/ 0;
-                    const circle = document.getElementById('score-circle');
-                    const circumference = 2 * Math.PI * 70; // ~440
-                    const offset = circumference - (percent / 100) * circumference;
-                    setTimeout(() => { circle.style.strokeDashoffset = offset; }, 300);
-                });
-            </script>
+            <a href="/dashboard" class="btn-dashboard">Back to Dashboard</a>
         </div>
     </div>
 

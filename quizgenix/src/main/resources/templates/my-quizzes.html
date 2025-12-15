@@ -7,123 +7,580 @@
 <body>
 
     <section>
+        <style>
+            /* --- 1. NEW PREMIUM ALERT BANNER --- */
+            .premium-alert {
+                background: linear-gradient(to right, rgba(234, 179, 8, 0.1), rgba(30, 41, 59, 0.4));
+                border: 1px solid rgba(234, 179, 8, 0.2);
+                border-left: 4px solid #eab308;
+                color: #e2e8f0;
+                padding: 15px 20px;
+                border-radius: 8px;
+                margin-bottom: 25px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s ease;
+            }
+
+            .premium-alert:hover {
+                transform: translateY(-2px);
+                background: linear-gradient(to right, rgba(234, 179, 8, 0.15), rgba(30, 41, 59, 0.5));
+            }
+
+            .premium-icon {
+                color: #eab308;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.3));
+            }
+
+            .premium-link {
+                color: #facc15;
+                font-weight: 700;
+                text-decoration: none;
+                border-bottom: 1px dashed #facc15;
+                margin-left: 5px;
+                transition: all 0.2s;
+            }
+
+            .premium-link:hover {
+                color: #fff;
+                border-bottom-style: solid;
+            }
+
+            /* --- 2. BUTTON STYLES --- */
+            .btn-action {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 0.9rem;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                background-color: transparent;
+                cursor: pointer;
+            }
+
+            .btn-outline-blue {
+                border: 1px solid #3b82f6;
+                color: #3b82f6;
+            }
+
+            .btn-outline-blue:hover {
+                opacity: 0.8;
+            }
+
+            .btn-outline-red {
+                border: 1px solid #ef4444;
+                color: #ef4444;
+            }
+
+            .btn-outline-red:hover {
+                opacity: 0.8;
+            }
+
+            .btn-locked {
+                border: 1px solid #ef4444;
+                color: #ef4444;
+                position: relative;
+                background-color: transparent;
+            }
+
+            .btn-locked:hover {
+                background-color: transparent;
+                color: #ef4444;
+                border-color: #ef4444;
+            }
+
+            .btn-locked:hover::after {
+                content: "Upgrade to Unlock";
+                position: absolute;
+                bottom: 115%;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #1e293b;
+                color: #fff;
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 999;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-locked:hover::before {
+                content: "";
+                position: absolute;
+                bottom: 105%;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 5px;
+                border-style: solid;
+                border-color: #1e293b transparent transparent transparent;
+                z-index: 999;
+            }
+
+            /* --- 3. MODAL STYLES --- */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.85);
+                z-index: 10000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+                animation: fadeIn 0.3s ease-out;
+                padding: 20px;
+            }
+
+            .modal-box {
+                background: #1e293b;
+                border: 1px solid rgba(139, 92, 246, 0.3);
+                padding: 2.5rem;
+                border-radius: 20px;
+                text-align: center;
+                max-width: 400px;
+                width: 100%;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+                transform: scale(0.9);
+                animation: popIn 0.3s ease-out forwards;
+                position: relative;
+            }
+
+            .modal-icon {
+                width: 70px;
+                height: 70px;
+                background: rgba(139, 92, 246, 0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.5rem auto;
+            }
+
+            .modal-icon svg {
+                width: 35px !important;
+                height: 35px !important;
+                color: #8b5cf6;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                color: white;
+            }
+
+            .modal-text {
+                color: #94a3b8;
+                margin-bottom: 2rem;
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            .btn-modal {
+                display: inline-block;
+                background: #8b5cf6;
+                color: white;
+                border: none;
+                padding: 0.8rem 2rem;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: 0.2s;
+                width: 100%;
+                font-size: 1rem;
+                text-decoration: none;
+            }
+
+            .btn-modal:hover {
+                background: #7c3aed;
+                transform: translateY(-2px);
+            }
+
+            .btn-modal-close {
+                background: transparent;
+                color: #64748b;
+                border: none;
+                margin-top: 15px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                text-decoration: underline;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes popIn {
+                from {
+                    transform: scale(0.8);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            /* --- 4. NEW FILTERS & PAGINATION STYLES --- */
+            /* --- MODERN FILTER BAR STYLE --- */
+            .filter-form {
+                background: rgba(30, 41, 59, 0.7);
+                /* Semi-transparent dark slate */
+                backdrop-filter: blur(10px);
+                /* Glass effect */
+                padding: 20px 25px;
+                border-radius: 16px;
+                /* Softer corners */
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                align-items: flex-end;
+                /* Align inputs and button at bottom */
+                margin-bottom: 30px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+
+            .filter-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                min-width: 180px;
+                /* Ensure dates aren't squashed */
+                flex: 1;
+            }
+
+            .filter-label {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #94a3b8;
+                font-weight: 700;
+            }
+
+            .form-control {
+                background: #0f172a;
+                /* Darker background for inputs */
+                border: 1px solid #334155;
+                color: #e2e8f0;
+                padding: 10px 16px;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                font-family: inherit;
+                outline: none;
+                transition: all 0.2s ease;
+
+                /* Makes the calendar icon white in Chrome/Edge */
+                color-scheme: dark;
+            }
+
+            .form-control:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            }
+
+            .btn-filter {
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                color: white;
+                border: none;
+                padding: 0 24px;
+                height: 42px;
+                /* Matches input height */
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+                transition: transform 0.1s, box-shadow 0.1s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 120px;
+            }
+
+            .btn-filter:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 10px -1px rgba(37, 99, 235, 0.4);
+            }
+
+            .btn-filter:active {
+                transform: translateY(0);
+            }
+
+            .btn-clear {
+                color: #64748b;
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 500;
+                padding: 10px 15px;
+                transition: color 0.2s;
+                height: 42px;
+                display: flex;
+                align-items: center;
+            }
+
+            .btn-clear:hover {
+                color: #ef4444;
+                /* Red on hover */
+            }
+
+            /* Pagination */
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                margin-top: 30px;
+            }
+
+            .page-link {
+                padding: 8px 14px;
+                background: #1e293b;
+                border: 1px solid #334155;
+                color: #94a3b8;
+                text-decoration: none;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                transition: all 0.2s;
+            }
+
+            .page-link:hover {
+                background: #334155;
+                color: white;
+            }
+
+            .page-link.active {
+                background: #3b82f6;
+                border-color: #3b82f6;
+                color: white;
+            }
+
+            .page-link.disabled {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+        </style>
 
         <h1>My Quizzes</h1>
 
-        <div class="filter-bar">
+        <form th:action="@{/my-quizzes}" method="get" class="filter-form">
+
+            <div class="filter-group">
+                <label class="filter-label">From Date</label>
+                <input type="date" name="startDate" th:value="${startDate}" class="form-control">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">To Date</label>
+                <input type="date" name="endDate" th:value="${endDate}" class="form-control">
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button type="submit" class="btn-filter">
+                    Filter
+                </button>
+                <a th:href="@{/my-quizzes}" class="btn-clear">Reset</a>
+            </div>
+        </form>
+
+        <div class="filter-bar" style="margin-top: 0; margin-bottom: 20px;">
             <div class="search-box">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="searchInput" placeholder="Search past quizzes..." onkeyup="filterQuizzes()">
+                <input type="text" id="searchInput" placeholder="Search current page..." onkeyup="filterQuizzes()">
             </div>
-
             <select class="filter-select" id="topicFilter" onchange="filterQuizzes()">
-                <option value="all">All Topics</option>
-                <option value="Java">Java</option>
-                <option value="Python">Python</option>
-                <option value="React">React</option>
+                <option value="all">All Topics (Page)</option>
+                <option th:each="topic : ${topicList}" th:value="${topic}" th:text="${#strings.capitalize(topic)}">Java
+                </option>
             </select>
-
             <select class="filter-select" id="statusFilter" onchange="filterQuizzes()">
-                <option value="all">All Status</option>
+                <option value="all">All Status (Page)</option>
                 <option value="passed">Passed</option>
                 <option value="failed">Failed</option>
             </select>
         </div>
 
+        <div th:if="${isHistoryLimited}" class="premium-alert">
+            <div class="premium-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <span>
+                Showing history for the <b>last 7 days</b> (Free Plan).
+                Unlock your full history and detailed PDF reports.
+                <a href="/pricing" class="premium-link">Upgrade to Premium &rarr;</a>
+            </span>
+        </div>
+
         <div class="history-grid">
+            <div th:each="quiz : ${quizzes}" class="history-card"
+                th:classappend="${quiz.score >= 80 ? 'high-score' : (quiz.score >= 50 ? 'mid-score' : 'low-score')}"
+                th:data-topic="${quiz.topic}" th:data-status="${quiz.score >= 50 ? 'passed' : 'failed'}">
 
-            <div class="history-card high-score" data-topic="Java" data-status="passed">
                 <div class="h-header">
-                    <span class="h-difficulty">Medium</span>
-                    <span class="h-date">2 hours ago</span>
+                    <span class="h-difficulty" th:text="${quiz.difficulty}">Medium</span>
+                    <span class="h-date"
+                        th:text="${#temporals.format(quiz.createdAt, 'dd MMM yyyy, hh:mm a')}">Date</span>
                 </div>
-                <div class="h-topic">Java Basics</div>
+
+                <div class="h-topic" th:text="${quiz.topic}" style="text-transform: capitalize;">Topic Name</div>
+
                 <div class="h-score">
                     <div>
-                        <div class="score-val">90%</div>
-                        <div class="score-status">Excellent</div>
+                        <div class="score-val" th:text="${quiz.score + '%'}">0%</div>
+                        <div class="score-status"
+                            th:text="${quiz.score >= 80 ? 'Excellent' : (quiz.score >= 50 ? 'Good' : 'Failed')}">Status
+                        </div>
                     </div>
-                    <div style="font-size: 2rem;">🏆</div>
+                    <div style="font-size: 2rem;"
+                        th:text="${quiz.score >= 80 ? '🏆' : (quiz.score >= 50 ? '🤔' : '📉')}">🏆</div>
                 </div>
-                <div class="h-actions">
-                    <a href="#" class="btn-small btn-review">Review</a>
-                    <a href="#" class="btn-small btn-retake">Retake</a>
+
+                <div class="h-actions" style="display: flex; gap: 10px;"
+                    th:with="hasAccess=${user.activePlan == '6-Month Plan' or user.activePlan == 'Yearly Plan'}">
+
+                    <a th:href="@{/quiz/review/{id}(id=${quiz.id})}" class="btn-action btn-outline-blue">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Review
+                    </a>
+
+                    <a th:if="${hasAccess}" th:href="@{/quiz/download-pdf/{id}(id=${quiz.id})}" target="_blank"
+                        class="btn-action btn-outline-red">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        PDF
+                    </a>
+
+                    <button th:unless="${hasAccess}" type="button" class="btn-action btn-locked"
+                        onclick="showUpgradeAlert()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>PDF</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="history-card mid-score" data-topic="Spring" data-status="passed">
-                <div class="h-header">
-                    <span class="h-difficulty">Hard</span>
-                    <span class="h-date">Yesterday</span>
-                </div>
-                <div class="h-topic">Spring Security</div>
-                <div class="h-score">
-                    <div>
-                        <div class="score-val">65%</div>
-                        <div class="score-status">Good</div>
-                    </div>
-                    <div style="font-size: 2rem;">🤔</div>
-                </div>
-                <div class="h-actions">
-                    <a href="#" class="btn-small btn-review">Review</a>
-                    <a href="#" class="btn-small btn-retake">Retake</a>
-                </div>
+            <div th:if="${#lists.isEmpty(quizzes)}"
+                style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 2rem;">
+                <p>No quizzes found for the selected date range.</p>
             </div>
+        </div>
 
-            <div class="history-card low-score" data-topic="React" data-status="failed">
-                <div class="h-header">
-                    <span class="h-difficulty">Expert</span>
-                    <span class="h-date">3 days ago</span>
+        <div class="pagination-container" th:if="${totalPages > 1}">
+
+            <a th:href="@{/my-quizzes(page=${currentPage - 1}, startDate=${startDate}, endDate=${endDate})}"
+                class="page-link" th:classappend="${currentPage == 0} ? 'disabled'">
+                &larr; Prev
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/my-quizzes(page=${i}, startDate=${startDate}, endDate=${endDate})}" class="page-link"
+                    th:text="${i + 1}" th:classappend="${currentPage == i} ? 'active'">
+                    1
+                </a>
+            </span>
+
+            <a th:href="@{/my-quizzes(page=${currentPage + 1}, startDate=${startDate}, endDate=${endDate})}"
+                class="page-link" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+                Next &rarr;
+            </a>
+        </div>
+
+        <div id="upgradeModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-icon">
+                    <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
                 </div>
-                <div class="h-topic">React Hooks</div>
-                <div class="h-score">
-                    <div>
-                        <div class="score-val">40%</div>
-                        <div class="score-status">Failed</div>
-                    </div>
-                    <div style="font-size: 2rem;">📉</div>
-                </div>
-                <div class="h-actions">
-                    <a href="#" class="btn-small btn-review">Review</a>
-                    <a href="#" class="btn-small btn-retake">Retake</a>
-                </div>
+                <h3 class="modal-title">Premium Feature</h3>
+                <p class="modal-text">This detailed report is locked. Upgrade to our <b>Premium Plan</b> to unlock PDF
+                    downloads and advanced analytics.</p>
+                <a href="/pricing" class="btn-modal">Upgrade Now</a>
+                <button onclick="closeUpgradeAlert()" class="btn-modal-close">No thanks, maybe later</button>
             </div>
-
         </div>
 
         <script>
+            // Modal Logic
+            document.addEventListener("DOMContentLoaded", function () {
+                const modal = document.getElementById('upgradeModal');
+                if (modal) { document.body.appendChild(modal); }
+            });
+
+            function showUpgradeAlert() {
+                document.getElementById('upgradeModal').style.display = 'flex';
+            }
+
+            function closeUpgradeAlert() {
+                document.getElementById('upgradeModal').style.display = 'none';
+            }
+
+            document.getElementById('upgradeModal').addEventListener('click', function (e) {
+                if (e.target === this) { closeUpgradeAlert(); }
+            });
+
+            // Client-Side Filter Logic (Note: Only filters the CURRENT page)
             function filterQuizzes() {
                 const search = document.getElementById('searchInput').value.toLowerCase();
                 const topic = document.getElementById('topicFilter').value.toLowerCase();
                 const status = document.getElementById('statusFilter').value.toLowerCase();
-
                 const cards = document.querySelectorAll('.history-card');
 
                 cards.forEach(card => {
-                    // Get data from our hardcoded attributes
                     const cardTopic = (card.getAttribute('data-topic') || "").toLowerCase();
                     const cardStatus = (card.getAttribute('data-status') || "").toLowerCase();
                     const visibleText = card.innerText.toLowerCase();
-
                     const textMatch = visibleText.includes(search);
-
-                    // Logic for "All" or match
                     const topicMatch = (topic === 'all') || cardTopic.includes(topic);
                     const statusMatch = (status === 'all') || (cardStatus === status);
 
-                    if (textMatch && topicMatch && statusMatch) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    card.style.display = (textMatch && topicMatch && statusMatch) ? 'flex' : 'none';
                 });
             }
         </script>
-
     </section>
 
 </body>

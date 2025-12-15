@@ -3,7 +3,7 @@ package com.quizgenix.service;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects; // Required Import
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,6 +21,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    // --- 1. VERIFICATION EMAIL ---
     public void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
         String toAddress = user.getEmail();
@@ -42,6 +43,7 @@ public class EmailService {
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
+    // --- 2. RESET PASSWORD EMAIL ---
     public void sendResetPasswordEmail(User user, String resetURL)
             throws MessagingException, UnsupportedEncodingException {
 
@@ -63,6 +65,7 @@ public class EmailService {
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
+    // --- 3. PAYMENT SUCCESS EMAIL ---
     public void sendPaymentSuccessEmail(String toAddress, String name, String paymentId, String amount, String planName)
             throws MessagingException, UnsupportedEncodingException {
 
@@ -100,6 +103,37 @@ public class EmailService {
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
+    // --- 4. NEW: DELETE ACCOUNT OTP EMAIL ---
+    public void sendDeleteOtpEmail(User user, String otp)
+            throws MessagingException, UnsupportedEncodingException {
+
+        String toAddress = user.getEmail();
+        String fromAddress = "security@quizgenix.com";
+        String senderName = "QuizGenix Security";
+        String subject = "Delete Account Verification Code";
+        String firstName = capitalize(user.getFirstName());
+
+        String messageBody = "<span style='color: #ef4444; font-weight: bold;'>⚠️ Warning:</span> You have requested to permanently delete your account.<br><br>"
+                +
+                "If you proceed, all your quizzes, history, and profile data will be lost immediately.<br><br>" +
+                "Use the code below to confirm this action:<br><br>" +
+                "<div style='background: #1e293b; padding: 15px; border-radius: 8px; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #fff; display: inline-block; border: 1px dashed #ef4444;'>"
+                +
+                otp +
+                "</div>";
+
+        String content = getEmailTemplate(
+                "Account Deletion ⚠️",
+                "Hello, " + firstName,
+                messageBody,
+                "Cancel Request",
+                "http://localhost:8080/settings"); // Button leads back to settings
+
+        sendEmail(toAddress, fromAddress, senderName, subject, content);
+    }
+
+    // --- HELPERS ---
+
     private String capitalize(String str) {
         if (str == null || str.isEmpty())
             return str;
@@ -112,11 +146,10 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
-        // FIX: Wrap ALL parameters to satisfy strict null analysis
         helper.setFrom(Objects.requireNonNull(from), Objects.requireNonNull(senderName));
         helper.setTo(Objects.requireNonNull(to));
         helper.setSubject(Objects.requireNonNull(subject));
-        helper.setText(Objects.requireNonNull(content), true);
+        helper.setText(Objects.requireNonNull(content), true); // true = HTML
 
         mailSender.send(message);
     }

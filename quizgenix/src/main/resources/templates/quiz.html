@@ -201,11 +201,17 @@
             font-size: 0.9rem;
             color: var(--text-muted);
             transition: 0.2s;
+            flex-shrink: 0;
         }
 
         .option-item:hover .option-marker {
             background: var(--primary);
             color: white;
+        }
+
+        .option-text {
+            font-size: 1rem;
+            color: var(--text-main);
         }
 
         .option-item.correct {
@@ -232,7 +238,7 @@
             pointer-events: none;
         }
 
-        /* --- 🟢 NEW: BLUR & LOCK STYLES --- */
+        /* --- BLUR & LOCK STYLES --- */
         .explanation-box {
             margin-top: 2rem;
             padding: 1.5rem;
@@ -241,11 +247,8 @@
             border-left: 4px solid var(--primary);
             animation: fadeIn 0.5s ease;
             display: none;
-            /* Hidden by default until answered */
             position: relative;
-            /* Needed for absolute positioning of lock */
             overflow: hidden;
-            /* Keeps blur inside */
         }
 
         .exp-title {
@@ -264,7 +267,6 @@
             line-height: 1.6;
         }
 
-        /* BLUR EFFECT */
         .blur-effect {
             filter: blur(6px);
             user-select: none;
@@ -272,7 +274,6 @@
             pointer-events: none;
         }
 
-        /* LOCK OVERLAY */
         .lock-overlay {
             position: absolute;
             top: 55%;
@@ -298,7 +299,6 @@
             cursor: default;
             pointer-events: none;
         }
-
 
         @keyframes fadeIn {
             from {
@@ -573,6 +573,17 @@
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
 
+            <form id="quizForm" method="POST" action="/quiz/submit" style="display:none;">
+                <input type="hidden" name="quizId" th:value="${quiz.id}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" name="forced_submission" id="forced_submission" value="false">
+
+                <div th:each="question, iterStat : ${quiz.questions}">
+                    <input type="hidden" th:name="'answer_' + ${iterStat.index}" th:id="'input-q-' + ${iterStat.index}"
+                        value="">
+                </div>
+            </form>
+
             <div th:each="question, iterStat : ${quiz.questions}" class="question-wrapper"
                 th:id="'question-' + ${iterStat.index}" th:classappend="${iterStat.index == 0} ? 'active' : ''">
 
@@ -591,7 +602,7 @@
                         <div class="option-marker"
                             th:text="${optStat.index == 0?'A':(optStat.index==1?'B':(optStat.index==2?'C':'D'))}">A
                         </div>
-                        <div th:text="${option}">Option</div>
+                        <div class="option-text" th:text="${option}">Option</div>
                     </div>
                 </div>
                 <div th:with="isPro=${user.activePlan != 'Free'}" th:id="'explanation-' + ${iterStat.index}"
@@ -830,7 +841,6 @@
             q.querySelectorAll('.option-item[data-is-correct="true"]').forEach(o => o.classList.add('correct'));
             questionTimers[currentIdx] = 0;
 
-            // Show Explanation (even if blurred) on Timeout
             const expBox = document.getElementById('explanation-' + currentIdx);
             if (expBox) expBox.style.display = 'block';
 
@@ -849,12 +859,14 @@
                 card.parentElement.querySelectorAll('[data-is-correct="true"]').forEach(o => o.classList.add('correct'));
             }
 
-            const selectedValue = card.querySelector('.option-marker').innerText.trim();
-            userAnswers[idx] = selectedValue;
+            // 🟢 Get full text from the new .option-text div
+            const selectedValue = card.querySelector('.option-text').innerText.trim();
+
+            // 🟢 UPDATE HIDDEN FORM INPUT
+            const hiddenInput = document.getElementById('input-q-' + idx);
+            if (hiddenInput) hiddenInput.value = selectedValue;
 
             questionTimers[idx] = 0;
-
-            // 🟢 REVEAL EXPLANATION (Blurred or Clear)
             const expBox = document.getElementById('explanation-' + idx);
             if (expBox) expBox.style.display = 'block';
 
@@ -875,43 +887,11 @@
 
         function finishQuizAndSubmit(auto) {
             clearInterval(timerInterval);
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/quiz/submit';
-
-            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            const csrfParam = document.querySelector('meta[name="_csrf_parameter"]').content;
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = csrfParam;
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-
-            const idInput = document.createElement('input');
-            idInput.type = 'hidden';
-            idInput.name = 'quizId';
-            idInput.value = quizId;
-            form.appendChild(idInput);
-
-            for (let i = 0; i < totalQuestions; i++) {
-                const val = userAnswers[i] || "";
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'answer_' + i;
-                input.value = val;
-                form.appendChild(input);
-            }
-
             if (auto) {
-                const secInput = document.createElement('input');
-                secInput.type = 'hidden';
-                secInput.name = 'forced_submission';
-                secInput.value = 'true';
-                form.appendChild(secInput);
+                document.getElementById('forced_submission').value = 'true';
             }
-
-            document.body.appendChild(form);
-            form.submit();
+            // 🟢 SUBMIT THE HIDDEN FORM (which now has correct name="answer_X")
+            document.getElementById('quizForm').submit();
         }
     </script>
 

@@ -409,7 +409,8 @@
             <div class="user-trigger">
 
                 <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                    th:src="@{'/images/' + ${user.profileImage}}" class="nav-avatar-img" alt="Avatar">
+                    th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : '/user-photos/' + user.profileImage}"
+                    class="nav-avatar-img" alt="Avatar">
 
                 <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
                     class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">

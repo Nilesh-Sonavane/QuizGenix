@@ -36,4 +36,16 @@ public class Quiz {
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
     private List<Question> questions;
+
+    public int getCorrectAnswers() {
+        // Calculate correct answers based on score percentage
+        if (this.totalQuestions == 0)
+            return 0;
+        return (int) Math.round((this.score / 100.0) * this.totalQuestions);
+    }
+
+    public int getXpEarned() {
+        // Example Rule: 10 XP per correct answer
+        return getCorrectAnswers() * 10;
+    }
 }
