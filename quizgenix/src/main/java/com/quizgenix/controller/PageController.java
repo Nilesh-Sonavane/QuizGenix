@@ -237,22 +237,6 @@ public class PageController {
         return "pricing";
     }
 
-    // --- Admin Pages ---
-    @GetMapping("/admin/")
-    public String admin() {
-        return "admin/dashboard";
-    }
-
-    @GetMapping("/admin/dashboard")
-    public String adminDashboard() {
-        return "admin/dashboard";
-    }
-
-    @GetMapping("/admin/users")
-    public String adminUsers() {
-        return "admin/users";
-    }
-
     @GetMapping("/admin/payments")
     public String payments() {
         return "admin/payments";

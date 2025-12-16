@@ -24,14 +24,13 @@ public class EmailService {
     // --- 1. VERIFICATION EMAIL ---
     public void sendVerificationEmail(User user, String siteURL)
             throws MessagingException, UnsupportedEncodingException {
+        // ... (Keep existing code) ...
         String toAddress = user.getEmail();
         String fromAddress = "no-reply@quizgenix.com";
         String senderName = "QuizGenix Team";
         String subject = "Verify your QuizGenix Account";
-
         String verifyURL = siteURL + "/verify?code=" + user.getVerificationCode();
         String firstName = capitalize(user.getFirstName());
-
         String content = getEmailTemplate(
                 "Welcome to QuizGenix! 👋",
                 "Hello, " + firstName + "!",
@@ -39,20 +38,18 @@ public class EmailService {
                         "To get started with AI-powered learning, please verify your email address by clicking the button below.",
                 "Verify My Account",
                 verifyURL);
-
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
     // --- 2. RESET PASSWORD EMAIL ---
     public void sendResetPasswordEmail(User user, String resetURL)
             throws MessagingException, UnsupportedEncodingException {
-
+        // ... (Keep existing code) ...
         String toAddress = user.getEmail();
         String fromAddress = "contact@quizgenix.com";
         String senderName = "QuizGenix Support";
         String subject = "Reset Your Password";
         String firstName = capitalize(user.getFirstName());
-
         String content = getEmailTemplate(
                 "Password Reset Request 🔒",
                 "Hello, " + firstName,
@@ -61,21 +58,18 @@ public class EmailService {
                         "This link will expire in 30 minutes.",
                 "Reset Password",
                 resetURL);
-
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
     // --- 3. PAYMENT SUCCESS EMAIL ---
     public void sendPaymentSuccessEmail(String toAddress, String name, String paymentId, String amount, String planName)
             throws MessagingException, UnsupportedEncodingException {
-
+        // ... (Keep existing code) ...
         String fromAddress = "billing@quizgenix.com";
         String senderName = "QuizGenix Billing";
         String subject = "Payment Receipt - " + planName;
-
         String displayName = capitalize(name);
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
-
         String messageBody = "Your subscription to the <strong>" + planName
                 + "</strong> is successfully confirmed.<br><br>" +
                 "Here are your transaction details:<br><br>" +
@@ -92,27 +86,24 @@ public class EmailService {
                 + amount + "</span></p>" +
                 "</div><br>" +
                 "Thank you for investing in your learning journey!";
-
         String content = getEmailTemplate(
                 "Payment Successful! 🎉",
                 "Hello, " + displayName,
                 messageBody,
                 "Go to Dashboard",
                 "http://localhost:8080/dashboard");
-
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 
-    // --- 4. NEW: DELETE ACCOUNT OTP EMAIL ---
+    // --- 4. DELETE ACCOUNT OTP EMAIL ---
     public void sendDeleteOtpEmail(User user, String otp)
             throws MessagingException, UnsupportedEncodingException {
-
+        // ... (Keep existing code) ...
         String toAddress = user.getEmail();
         String fromAddress = "security@quizgenix.com";
         String senderName = "QuizGenix Security";
         String subject = "Delete Account Verification Code";
         String firstName = capitalize(user.getFirstName());
-
         String messageBody = "<span style='color: #ef4444; font-weight: bold;'>⚠️ Warning:</span> You have requested to permanently delete your account.<br><br>"
                 +
                 "If you proceed, all your quizzes, history, and profile data will be lost immediately.<br><br>" +
@@ -121,14 +112,52 @@ public class EmailService {
                 +
                 otp +
                 "</div>";
-
         String content = getEmailTemplate(
                 "Account Deletion ⚠️",
                 "Hello, " + firstName,
                 messageBody,
                 "Cancel Request",
-                "http://localhost:8080/settings"); // Button leads back to settings
+                "http://localhost:8080/settings");
+        sendEmail(toAddress, fromAddress, senderName, subject, content);
+    }
 
+    // --- 5. NEW: ADMIN BAN/UNBAN EMAIL ---
+    public void sendAccountStatusEmail(User user, boolean isEnabled)
+            throws MessagingException, UnsupportedEncodingException {
+
+        String toAddress = user.getEmail();
+        String fromAddress = "support@quizgenix.com";
+        String senderName = "QuizGenix Support";
+        String firstName = capitalize(user.getFirstName());
+
+        String subject;
+        String headerTitle;
+        String messageBody;
+        String buttonText;
+        String linkUrl;
+
+        if (isEnabled) {
+            // Case: User was Unbanned / Activated
+            subject = "Account Reactivated - QuizGenix";
+            headerTitle = "Welcome Back! 🔓";
+            messageBody = "Good news! Your account has been reviewed and <strong>reactivated</strong> by our administration.<br><br>"
+                    +
+                    "You now have full access to your quizzes, history, and profile.";
+            buttonText = "Login Now";
+            linkUrl = "http://localhost:8080/login";
+        } else {
+            // Case: User was Banned / Blocked
+            subject = "Account Suspended - QuizGenix";
+            headerTitle = "Account Suspended ⚠️";
+            messageBody = "<span style='color: #ef4444; font-weight: bold;'>Notice:</span> Your account has been suspended by the administrator.<br><br>"
+                    +
+                    "This action was taken due to a violation of our policies or security concerns.<br><br>" +
+                    "If you believe this is a mistake, please contact our support team immediately.";
+            buttonText = "Contact Support";
+            linkUrl = "mailto:support@quizgenix.com";
+        }
+
+        String content = getEmailTemplate(headerTitle, "Hello, " + firstName, messageBody, buttonText, linkUrl);
         sendEmail(toAddress, fromAddress, senderName, subject, content);
     }
 

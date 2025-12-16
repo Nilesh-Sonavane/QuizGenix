@@ -2,6 +2,8 @@ package com.quizgenix.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,6 +44,10 @@ public class User {
 
     private String role;
     private boolean enabled = false;
+
+    @CreationTimestamp // Automatically sets date when user registers
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @Column(name = "verification_code", length = 64)
     private String verificationCode;
