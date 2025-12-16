@@ -183,8 +183,10 @@
             <div class="xp-badge">
                 <span>⚡</span>
                 <span th:with="diff=${quiz.difficulty}, 
-                               baseXp=${#strings.equalsIgnoreCase(diff, 'Hard') ? 20 : (#strings.equalsIgnoreCase(diff, 'Medium') ? 15 : 10)},
-                               correctCount=${(score * total) / 100.0}">
+                           baseXp=${#strings.equalsIgnoreCase(diff, 'Expert') ? 5 : 
+                                   (#strings.equalsIgnoreCase(diff, 'Hard') ? 3 : 
+                                   (#strings.equalsIgnoreCase(diff, 'Medium') ? 2 : 1))},
+                           correctCount=${(score * total) / 100.0}">
                     +<span th:text="${T(java.lang.Math).round(correctCount * baseXp)}">0</span> XP Earned
                 </span>
             </div>

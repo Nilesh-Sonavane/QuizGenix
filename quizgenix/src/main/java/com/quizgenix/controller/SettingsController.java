@@ -192,6 +192,9 @@ public class SettingsController {
 
             if (!userPayments.isEmpty()) {
                 for (Payment payment : userPayments) {
+                    // Snapshot the user details PERMANENTLY into the payment record
+                    payment.setArchivedUserName(user.getFirstName() + " " + user.getLastName());
+                    payment.setArchivedUserEmail(user.getEmail());
                     payment.setUser(null); // Remove link to user
                     paymentRepository.save(payment); // Update database
                 }

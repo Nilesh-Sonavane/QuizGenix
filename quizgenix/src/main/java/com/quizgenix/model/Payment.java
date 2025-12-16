@@ -35,4 +35,8 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    // --- NEW SNAPSHOT FIELDS (To keep history after delete) ---
+    private String archivedUserName;
+    private String archivedUserEmail;
 }

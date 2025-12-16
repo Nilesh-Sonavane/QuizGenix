@@ -61,9 +61,8 @@ public class QuizPdfService {
 
             Font questionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, TEXT_MAIN);
             Font optionFont = FontFactory.getFont(FontFactory.HELVETICA, 10, TEXT_MAIN);
-            Font correctOptionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new BaseColor(21, 128, 61)); // Dark
-                                                                                                                      // Green
-            Font wrongOptionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, FAIL_RED); // Dark Red
+            Font correctOptionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new BaseColor(21, 128, 61));
+            Font wrongOptionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, FAIL_RED);
             Font explanationFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 9, TEXT_SUB);
             Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, TEXT_MAIN);
 
@@ -117,7 +116,24 @@ public class QuizPdfService {
             scoreVal.setAlignment(Element.ALIGN_CENTER);
             scoreCard.addElement(scoreVal);
 
-            Paragraph xpVal = new Paragraph("+" + quiz.getXpEarned() + " XP", xpFont);
+            // --- FIXED XP CALCULATION (Matches Thymeleaf Logic) ---
+            String diff = (quiz.getDifficulty() != null) ? quiz.getDifficulty() : "Easy";
+            int baseXp = 1; // Default
+
+            if (diff.equalsIgnoreCase("Expert"))
+                baseXp = 5;
+            else if (diff.equalsIgnoreCase("Hard"))
+                baseXp = 3;
+            else if (diff.equalsIgnoreCase("Medium"))
+                baseXp = 2;
+
+            // Calculate correct answers based on score (Same as frontend)
+            double correctCount = (quiz.getScore() * quiz.getTotalQuestions()) / 100.0;
+            long finalXp = Math.round(correctCount * baseXp);
+
+            Paragraph xpVal = new Paragraph("+" + finalXp + " XP", xpFont);
+            // -----------------------------------------------------
+
             xpVal.setAlignment(Element.ALIGN_CENTER);
             xpVal.setSpacingBefore(2f);
             scoreCard.addElement(xpVal);
@@ -181,21 +197,18 @@ public class QuizPdfService {
                     titleTable.addCell(titleCell);
                     qCell.addElement(titleTable);
 
-                    // B. Options (Updated Logic)
+                    // B. Options
                     PdfPTable optTable = new PdfPTable(1);
                     optTable.setWidthPercentage(100);
 
                     List<String> options = q.getOptions();
 
-                    // Retrieve Data from Question Object
-                    // Assuming 'getCorrectAnswerIndex' works, lets get the string text for
-                    // comparison
                     String dbCorrectText = "";
                     int correctIdx = q.getCorrectAnswerIndex();
                     if (correctIdx != -1 && options != null && correctIdx < options.size()) {
                         dbCorrectText = options.get(correctIdx);
                     } else if (q.getCorrectAnswer() != null) {
-                        dbCorrectText = q.getCorrectAnswer(); // Fallback
+                        dbCorrectText = q.getCorrectAnswer();
                     }
 
                     String userSelectedText = (q.getUserAnswer() != null) ? q.getUserAnswer().trim() : "";
@@ -205,7 +218,6 @@ public class QuizPdfService {
                             String optText = options.get(i);
                             char letter = (char) ('A' + i);
 
-                            // Check Conditions
                             boolean isCorrectOption = optText.equalsIgnoreCase(dbCorrectText);
                             boolean isUserSelected = optText.equalsIgnoreCase(userSelectedText);
 
@@ -216,19 +228,14 @@ public class QuizPdfService {
                             optCell.setPaddingLeft(10f);
 
                             if (isCorrectOption) {
-                                // 🟢 Correct Answer (Green BG)
                                 optCell.setBackgroundColor(SUCCESS_BG);
                                 optCell.addElement(
                                         new Paragraph(letter + ". " + optText + "  [ Correct ]", correctOptionFont));
-
                             } else if (isUserSelected && !isCorrectOption) {
-                                // 🔴 User Selected Wrong (Red BG)
                                 optCell.setBackgroundColor(FAIL_BG);
                                 optCell.addElement(
                                         new Paragraph(letter + ". " + optText + "  [ Your Answer ]", wrongOptionFont));
-
                             } else {
-                                // Neutral Option
                                 optCell.addElement(new Paragraph(letter + ". " + optText, optionFont));
                             }
                             optTable.addCell(optCell);
