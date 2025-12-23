@@ -32,4 +32,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             "GROUP BY p.planName")
     List<Object[]> countByPlanNameGroupedFromDate(@Param("startDate") LocalDateTime startDate);
 
+    // Fetch all payments sorted by newest first
+    List<Payment> findAllByOrderByCreatedAtDesc();
+
 }

@@ -237,11 +237,6 @@ public class PageController {
         return "pricing";
     }
 
-    @GetMapping("/admin/payments")
-    public String payments() {
-        return "admin/payments";
-    }
-
     @GetMapping("/admin/quiz-logs")
     public String adminLogs() {
         return "admin/quiz-logs";

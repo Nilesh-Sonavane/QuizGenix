@@ -3,13 +3,24 @@ package com.quizgenix.controller.admin;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders; // ADDED THIS
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType; // ADDED THIS
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.quizgenix.model.Payment;
 import com.quizgenix.model.User;
+import com.quizgenix.repository.PaymentRepository;
+import com.quizgenix.service.InvoiceService;
+import com.quizgenix.service.PaymentService;
 import com.quizgenix.service.admin.AdminUserService;
 import com.quizgenix.service.admin.DashboardService;
 import com.quizgenix.service.admin.DashboardService.ChartDataDTO;
@@ -22,6 +33,12 @@ public class AdminController {
     private DashboardService dashboardService;
     @Autowired
     private AdminUserService adminUserService;
+    @Autowired
+    private PaymentService paymentService;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private InvoiceService invoiceService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -52,5 +69,46 @@ public class AdminController {
     public String toggleUserStatus(@PathVariable Long id) {
         adminUserService.toggleUserStatus(id);
         return "redirect:/admin/users";
+    }
+
+    @GetMapping("/payments")
+    public String listPayments(Model model) {
+        List<Payment> payments = paymentService.getAllPayments();
+        model.addAttribute("payments", payments);
+        return "admin/payments";
+    }
+
+    // 1. DOWNLOAD INVOICE
+    @GetMapping("/payments/invoice/{id}")
+    public ResponseEntity<ByteArrayResource> downloadInvoice(@PathVariable Long id) {
+        try {
+            Payment payment = paymentRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Payment not found"));
+            byte[] data = invoiceService.generateInvoicePdf(payment);
+            ByteArrayResource resource = new ByteArrayResource(data);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment;filename=Invoice_" + payment.getPaymentId() + ".pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(data.length)
+                    .body(resource);
+        } catch (Exception e) {
+            e.printStackTrace(); // Good for debugging
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 2. SEND INVOICE VIA EMAIL (AJAX)
+    @PostMapping("/payments/invoice/send/{id}")
+    @ResponseBody
+    public ResponseEntity<String> sendInvoice(@PathVariable Long id) {
+        boolean sent = invoiceService.sendInvoiceEmail(id);
+        if (sent) {
+            return ResponseEntity.ok("Invoice sent successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to send invoice. No email found or error occurred.");
+        }
     }
 }
