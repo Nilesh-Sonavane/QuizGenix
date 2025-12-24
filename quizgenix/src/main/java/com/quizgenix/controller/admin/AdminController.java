@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders; // ADDED THIS
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType; // ADDED THIS
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.quizgenix.model.Payment;
+import com.quizgenix.model.Quiz;
 import com.quizgenix.model.User;
 import com.quizgenix.repository.PaymentRepository;
+import com.quizgenix.repository.QuizRepository;
 import com.quizgenix.service.InvoiceService;
 import com.quizgenix.service.PaymentService;
 import com.quizgenix.service.admin.AdminUserService;
@@ -39,6 +42,8 @@ public class AdminController {
     private PaymentRepository paymentRepository;
     @Autowired
     private InvoiceService invoiceService;
+    @Autowired
+    private QuizRepository quizRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -110,5 +115,16 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send invoice. No email found or error occurred.");
         }
+    }
+
+    @GetMapping("/quiz-logs")
+    public String quizLogs(Model model) {
+        // Fetch all quizzes sorted by newest first
+        List<Quiz> logs = quizRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        model.addAttribute("logs", logs);
+        model.addAttribute("pageTitle", "Quiz Logs");
+
+        return "admin/quiz-logs";
     }
 }

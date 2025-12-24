@@ -2,19 +2,85 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Quiz Logs')}">
 
 <head>
+
 </head>
 
 <body>
 
     <section>
-
-        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
         <style>
-            /* --- PAGE SPECIFIC CSS --- */
-            /* Reusing styles from users page for consistency */
+            /* Modal */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(4px);
+                z-index: 10000;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .modal-overlay.show {
+                display: flex;
+                opacity: 1;
+            }
+
+            .modal-box {
+                background: #1e293b;
+                border: 1px solid #334155;
+                padding: 2rem;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 500px;
+                text-align: left;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+                transform: translateY(-20px);
+                transition: transform 0.3s ease;
+            }
+
+            .modal-overlay.show .modal-box {
+                transform: translateY(0);
+            }
+
+            .modal-header {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: white;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                color: #94a3b8;
+                cursor: pointer;
+                font-size: 1.5rem;
+            }
         </style>
+        <div id="global-loader" class="loader-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text">PROCESSING...</div>
+        </div>
+
+        <div id="quizModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <span id="modalTitle">Quiz Details</span>
+                    <button class="close-modal" onclick="closeModal()">×</button>
+                </div>
+                <div style="color: #94a3b8; line-height: 1.6;" id="modalContent">
+                </div>
+            </div>
+        </div>
 
         <h1>Quiz Generation Logs</h1>
 
@@ -25,26 +91,28 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="customSearch" placeholder="Search topic or user...">
+                <input type="text" id="searchInput" placeholder="Search topic, ID or user..."
+                    onkeyup="resetAndFilter()">
             </div>
 
-            <select class="filter-select" id="difficultyFilter">
+            <select class="filter-select" id="difficultyFilter" onchange="resetAndFilter()">
                 <option value="">All Difficulty</option>
                 <option value="Easy">Easy</option>
                 <option value="Medium">Medium</option>
                 <option value="Hard">Hard</option>
             </select>
 
-            <select class="filter-select" id="questionsFilter">
+            <select class="filter-select" id="questionsFilter" onchange="resetAndFilter()">
                 <option value="">All Q-Count</option>
-                <option value="10">10 Qs</option>
-                <option value="25">25 Qs</option>
-                <option value="50">50 Qs</option>
+                <option value="10">10 Questions</option>
+                <option value="20">20 Questions</option>
+                <option value="30">30 Questions</option>
+                <option value="50">50 Questions</option>
             </select>
         </div>
 
         <div class="table-container">
-            <table id="quizTable">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>Quiz Details</th>
@@ -55,19 +123,42 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
+                <tbody id="tableBody">
+                    <tr th:each="quiz : ${logs}" class="log-row" th:data-topic="${#strings.toLowerCase(quiz.topic)}"
+                        th:data-id="${quiz.id}"
+                        th:data-user="${quiz.user != null ? #strings.toLowerCase(quiz.user.email) : ''}"
+                        th:data-difficulty="${quiz.difficulty}"
+                        th:data-questions="${quiz.questions != null ? quiz.questions.size() : 0}">
+
                         <td>
-                            <strong>Java Spring Boot</strong><br>
-                            <small style="color:#94a3b8">ID: #QZ-1092</small>
+                            <strong style="text-transform: capitalize;" th:text="${quiz.topic}">Topic</strong><br>
+                            <small style="color:#94a3b8; font-family: monospace;"
+                                th:text="'ID: #QZ-' + ${quiz.id}">ID</small>
                         </td>
-                        <td>john@example.com</td>
-                        <td><span class="badge bg-medium">Medium</span></td>
-                        <td>25</td>
-                        <td>Dec 15, 10:30 AM</td>
+
+                        <td>
+                            <div style="display:flex; align-items:center; gap:8px;">
+
+                                <span
+                                    th:text="${quiz.user != null ? quiz.user.email : 'Deleted User'}">user@email.com</span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge"
+                                th:classappend="${quiz.difficulty == 'Easy' ? 'bg-easy' : (quiz.difficulty == 'Medium' ? 'bg-medium' : 'bg-hard')}"
+                                th:text="${quiz.difficulty}">Diff</span>
+                        </td>
+
+                        <td th:text="${quiz.questions != null ? quiz.questions.size() : 0}">0</td>
+
+                        <td th:text="${#temporals.format(quiz.createdAt, 'MMM dd, hh:mm a')}">Date</td>
+
                         <td>
                             <div class="action-icons">
-                                <button class="icon-btn" title="View Questions">
+                                <button class="icon-btn" title="View Quiz Details" th:data-id="${quiz.id}"
+                                    th:data-topic="${quiz.topic}"
+                                    onclick="viewQuizDetails(this.getAttribute('data-id'), this.getAttribute('data-topic'))">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -78,70 +169,162 @@
                         </td>
                     </tr>
 
-                    <tr>
-                        <td>
-                            <strong>React Hooks</strong><br>
-                            <small style="color:#94a3b8">ID: #QZ-1093</small>
-                        </td>
-                        <td>alex@demo.com</td>
-                        <td><span class="badge bg-hard">Hard</span></td>
-                        <td>10</td>
-                        <td>Dec 15, 11:45 AM</td>
-                        <td>
-                            <div class="action-icons">
-                                <button class="icon-btn" title="View Questions">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <strong>Python Basics</strong><br>
-                            <small style="color:#94a3b8">ID: #QZ-1094</small>
-                        </td>
-                        <td>rahul@spam.com</td>
-                        <td><span class="badge bg-easy">Easy</span></td>
-                        <td>50</td>
-                        <td>Dec 14, 09:15 AM</td>
-                        <td>
-                            <div class="action-icons">
-                                <button class="icon-btn" title="View Questions">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 2rem;">No quiz logs match
+                            your search.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
+        <div class="pagination-controls" id="paginationControls">
+            <div id="showingText">Showing 0 to 0 of 0 entries</div>
+            <div class="pagination-btns">
+                <button class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>Previous</button>
+                <span class="page-info" id="pageNumberDisplay">Page 1</span>
+                <button class="page-btn" id="nextBtn" onclick="changePage(1)" disabled>Next</button>
+            </div>
+        </div>
+
         <script>
-            $(document).ready(function () {
-                var table = $('#quizTable').DataTable({
-                    "dom": 'rtip',
-                    "pageLength": 10,
-                    "ordering": true,
-                    "language": {
-                        "info": "Showing _START_ to _END_ of _TOTAL_ logs",
-                        "paginate": { "next": ">", "previous": "<" }
-                    }
+            // --- 1. CONFIG & INIT ---
+            const rowsPerPage = 10;
+            let currentPage = 1;
+            let allRows = [];
+            let filteredRows = [];
+
+            window.addEventListener('load', function () {
+                const loader = document.getElementById('global-loader');
+                if (loader) { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; }, 500); }
+
+                // Init Table
+                allRows = Array.from(document.querySelectorAll('.log-row'));
+                resetAndFilter();
+            });
+
+            // --- 2. FILTER LOGIC ---
+            function resetAndFilter() {
+                currentPage = 1;
+                applyFilter();
+            }
+
+            function applyFilter() {
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const diffFilter = document.getElementById('difficultyFilter').value;
+                const qFilter = document.getElementById('questionsFilter').value;
+
+                filteredRows = allRows.filter(row => {
+                    const topic = row.getAttribute('data-topic') || "";
+                    const id = (row.getAttribute('data-id') || "").toString();
+                    const user = row.getAttribute('data-user') || "";
+                    const difficulty = row.getAttribute('data-difficulty') || "";
+                    const questions = row.getAttribute('data-questions') || "";
+
+                    const matchesSearch = topic.includes(search) || id.includes(search) || user.includes(search);
+                    const matchesDiff = (diffFilter === "") || (difficulty === diffFilter);
+                    const matchesQ = (qFilter === "") || (questions === qFilter);
+
+                    return matchesSearch && matchesDiff && matchesQ;
                 });
 
-                // Connect Filters
-                $('#customSearch').on('keyup', function () { table.search(this.value).draw(); });
-                $('#difficultyFilter').on('change', function () { table.column(2).search(this.value).draw(); });
-                $('#questionsFilter').on('change', function () { table.column(3).search(this.value).draw(); });
-            });
+                // Handle Empty State
+                const noResults = document.getElementById('noResultsRow');
+                const pagination = document.getElementById('paginationControls');
+
+                if (filteredRows.length === 0) {
+                    noResults.style.display = "";
+                    pagination.style.display = 'none';
+                } else {
+                    noResults.style.display = "none";
+                    pagination.style.display = 'flex';
+                }
+
+                renderTable();
+            }
+
+            // --- 3. PAGINATION ENGINE ---
+            function renderTable() {
+                allRows.forEach(row => row.style.display = 'none'); // Hide all
+
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                // Show only current page rows
+                const currentRows = filteredRows.slice(start, end);
+                currentRows.forEach(row => row.style.display = '');
+
+                // Update UI
+                document.getElementById('prevBtn').disabled = (currentPage === 1);
+                document.getElementById('nextBtn').disabled = (currentPage >= totalPages || totalPages === 0);
+                document.getElementById('pageNumberDisplay').innerText = `Page ${currentPage} of ${totalPages || 1}`;
+
+                const showEnd = Math.min(end, filteredRows.length);
+                const showStart = filteredRows.length === 0 ? 0 : start + 1;
+                document.getElementById('showingText').innerText = `Showing ${showStart} to ${showEnd} of ${filteredRows.length} entries`;
+            }
+
+            function changePage(dir) {
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                const newPage = currentPage + dir;
+                if (newPage > 0 && newPage <= totalPages) {
+                    currentPage = newPage;
+                    renderTable();
+                }
+            }
+
+            // --- 4. MODAL LOGIC ---
+            function viewQuizDetails(id, topic) {
+                const modal = document.getElementById('quizModal');
+                const content = document.getElementById('modalContent');
+                const title = document.getElementById('modalTitle');
+
+                title.style.textTransform = "capitalize";
+                title.innerText = topic + " (ID: " + id + ")";
+
+                content.innerHTML = `
+                    <div style='text-align:center; padding:20px;'>
+                        <div class='spinner' style='width:30px;height:30px;margin:0 auto;'></div>
+                        <br>Fetching quiz data...
+                    </div>`;
+
+                modal.classList.add('show');
+
+                fetch('/admin/api/quiz/' + id)
+                    .then(response => {
+                        if (!response.ok) throw new Error("Quiz not found");
+                        return response.json();
+                    })
+                    .then(data => {
+                        content.innerHTML = `
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                                <div style="background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                                    <small style="color:#94a3b8; display:block; margin-bottom:5px;">Difficulty</small>
+                                    <strong style="color:white; font-size: 1.1rem;">${data.difficulty}</strong>
+                                </div>
+                                <div style="background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                                    <small style="color:#94a3b8; display:block; margin-bottom:5px;">Total Questions</small>
+                                    <strong style="color:white; font-size: 1.1rem;">${data.totalQuestions}</strong>
+                                </div>
+                                <div style="background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                                    <small style="color:#94a3b8; display:block; margin-bottom:5px;">Score</small>
+                                    <strong style="color:${data.score >= 50 ? '#22c55e' : '#ef4444'}; font-size: 1.1rem;">${data.score}%</strong>
+                                </div>
+                                <div style="background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                                    <small style="color:#94a3b8; display:block; margin-bottom:5px;">Topic</small>
+                                    <strong style="color:white; font-size: 1.1rem;text-transform: capitalize;">${data.topic}</strong>
+                                </div>
+                            </div>
+                        `;
+                    })
+                    .catch(err => {
+                        content.innerHTML = `<p style="color: #ef4444; text-align: center; padding: 20px;">Error: ${err.message}</p>`;
+                    });
+            }
+
+            function closeModal() {
+                document.getElementById('quizModal').classList.remove('show');
+            }
         </script>
 
     </section>
