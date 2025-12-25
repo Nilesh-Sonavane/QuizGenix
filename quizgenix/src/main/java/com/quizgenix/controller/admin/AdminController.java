@@ -1,10 +1,12 @@
 package com.quizgenix.controller.admin;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.quizgenix.dto.SystemEventDTO;
 import com.quizgenix.model.Payment;
 import com.quizgenix.model.Quiz;
 import com.quizgenix.model.User;
@@ -24,6 +28,7 @@ import com.quizgenix.repository.PaymentRepository;
 import com.quizgenix.repository.QuizRepository;
 import com.quizgenix.service.InvoiceService;
 import com.quizgenix.service.PaymentService;
+import com.quizgenix.service.ReportService;
 import com.quizgenix.service.admin.AdminUserService;
 import com.quizgenix.service.admin.DashboardService;
 import com.quizgenix.service.admin.DashboardService.ChartDataDTO;
@@ -44,6 +49,8 @@ public class AdminController {
     private InvoiceService invoiceService;
     @Autowired
     private QuizRepository quizRepository;
+    @Autowired
+    private ReportService reportService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -126,5 +133,46 @@ public class AdminController {
         model.addAttribute("pageTitle", "Quiz Logs");
 
         return "admin/quiz-logs";
+    }
+
+    @GetMapping("/reports")
+    public String reports(Model model) {
+        // 1. Fetch Logs
+        List<SystemEventDTO> logs = reportService.getRecentSystemEvents();
+
+        model.addAttribute("logs", logs);
+        model.addAttribute("revenueData", reportService.getRevenueChartData());
+        model.addAttribute("userData", reportService.getUserChartData());
+        model.addAttribute("pageTitle", "System Reports");
+
+        return "admin/reports";
+    }
+
+    // --- EXPORT CSV ---
+    @GetMapping("/reports/export/csv")
+    public ResponseEntity<byte[]> exportCsv(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        byte[] csvData = reportService.generateCsvReport(startDate, endDate);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=System_Report.csv")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(csvData);
+    }
+
+    // --- EXPORT PDF ---
+    @GetMapping("/reports/export/pdf")
+    public ResponseEntity<byte[]> exportPdf(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        byte[] pdfData = reportService.generatePdfReport(startDate, endDate);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=System_Report.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfData);
     }
 }

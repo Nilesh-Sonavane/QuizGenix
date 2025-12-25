@@ -237,11 +237,6 @@ public class PageController {
         return "pricing";
     }
 
-    @GetMapping("/admin/reports")
-    public String adminReports() {
-        return "admin/reports";
-    }
-
     @GetMapping("/admin/settings")
     public String adminSettings(Model model, Principal principal) {
         if (principal != null) {

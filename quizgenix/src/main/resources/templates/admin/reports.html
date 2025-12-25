@@ -1,29 +1,222 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Reports')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'System Reports')}">
 
 <head>
+    <style>
+        /* --- 1. SHARED THEME STYLES --- */
+        :root {
+            --primary: #8b5cf6;
+            --accent: #38bdf8;
+            --text-muted: #94a3b8;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+        }
+
+        /* Loader */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 14, 20, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(#0000 10%, var(--primary), var(--accent));
+            -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+            mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+            animation: spin 1.2s infinite linear;
+            border: none;
+        }
+
+        .loading-text {
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(1turn);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Toolbar */
+        .report-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .date-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-input {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+        }
+
+        .export-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-export {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .btn-export:hover:not(:disabled) {
+            background: var(--bg-card);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .btn-export:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        /* Chart & Tables */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-box {
+            height: 350px;
+            width: 100%;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .dot-success {
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+        }
+
+        .dot-warning {
+            background: #eab308;
+            box-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
+        }
+
+        .dot-danger {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .page-btn {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 
 <body>
-
     <section>
-
-        <style>
-            /* --- REPORT TOOLBAR --- */
-        </style>
+        <div id="global-loader" class="loader-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text">PROCESSING...</div>
+        </div>
 
         <h1>System Reports</h1>
-        <p class="welcome-text">Generate and export detailed system analysis.</p>
+        <p style="color: #94a3b8; margin-bottom: 20px;">Real-time system analysis and event logs.</p>
 
         <div class="report-toolbar">
             <div class="date-group">
                 <span style="color: #94a3b8; font-size: 0.9rem;">From:</span>
-                <input type="date" class="date-input">
+                <input type="date" class="date-input" id="dateFrom" onchange="filterData()">
                 <span style="color: #94a3b8; font-size: 0.9rem;">To:</span>
-                <input type="date" class="date-input">
+                <input type="date" class="date-input" id="dateTo" onchange="filterData()">
             </div>
             <div class="export-group">
-                <button class="btn-export">
+                <button class="btn-export" onclick="downloadReport('csv')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -31,7 +224,7 @@
                     </svg>
                     Export CSV
                 </button>
-                <button class="btn-export pdf">
+                <button class="btn-export pdf" onclick="downloadReport('pdf')">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
@@ -45,107 +238,249 @@
         </div>
 
         <div class="chart-card">
-            <div class="chart-header">
-                <h3>System Traffic & Revenue Analysis</h3>
-            </div>
+            <h3 style="color:white; margin-bottom: 20px; font-weight: 500;">Traffic & Revenue</h3>
             <div class="chart-box">
                 <canvas id="reportChart"></canvas>
             </div>
         </div>
 
         <div class="logs-section">
-            <h3>Recent System Events</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Event Type</th>
-                        <th>Description</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Backup</td>
-                        <td>Daily Database Backup</td>
-                        <td>Dec 16, 02:00 AM</td>
-                        <td><span class="status-dot dot-success"></span> Success</td>
-                    </tr>
-                    <tr>
-                        <td>Security</td>
-                        <td>Failed Login Attempt (IP: 192.168.x.x)</td>
-                        <td>Dec 15, 11:45 PM</td>
-                        <td><span class="status-dot dot-warning"></span> Flagged</td>
-                    </tr>
-                    <tr>
-                        <td>System</td>
-                        <td>Server Restart</td>
-                        <td>Dec 15, 04:00 AM</td>
-                        <td><span class="status-dot dot-success"></span> Success</td>
-                    </tr>
-                    <tr>
-                        <td>Error</td>
-                        <td>API Timeout (Quiz Generation)</td>
-                        <td>Dec 14, 09:12 PM</td>
-                        <td><span class="status-dot dot-danger"></span> Failed</td>
-                    </tr>
-                </tbody>
-            </table>
+            <h3 style="color:white; margin-bottom: 15px; font-weight: 500;">Recent System Events</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Event Type</th>
+                            <th>Description</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr th:each="log : ${logs}" class="log-row" th:data-date="${log.date}">
+                            <td th:text="${log.type}"></td>
+                            <td th:text="${log.description}"></td>
+                            <td th:text="${log.date != null ? #temporals.format(log.date, 'MMM dd, hh:mm a') : 'N/A'}">
+                            </td>
+                            <td><span class="status-dot"
+                                    th:classappend="${log.status == 'Success' ? 'dot-success' : (log.status == 'Failed' ? 'dot-danger' : 'dot-warning')}"></span><span
+                                    th:text="${log.status}"></span></td>
+                        </tr>
+                        <tr id="noResultsRow" style="display:none;">
+                            <td colspan="4" style="text-align:center; padding:2rem; color:#94a3b8;">No events match your
+                                filter.</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(logs)}">
+                            <td colspan="4" style="text-align:center; padding:2rem; color:#94a3b8;">No events found in
+                                database.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-controls" id="paginationControls" th:unless="${#lists.isEmpty(logs)}">
+                <div id="showingText">Showing entries</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>Previous</button>
+                    <span style="color:#e2e8f0; font-weight:500; align-self:center;" id="pageNumberDisplay">Page
+                        1</span>
+                    <button class="page-btn" id="nextBtn" onclick="changePage(1)" disabled>Next</button>
+                </div>
+            </div>
         </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const ctx = document.getElementById('reportChart').getContext('2d');
+        <script th:inline="javascript">
+            const revenueData = /*[[${revenueData}]]*/[0, 0, 0, 0];
+            const userData = /*[[${userData}]]*/[0, 0, 0, 0];
 
-                // Create Gradient
+            document.addEventListener('DOMContentLoaded', function () {
+                const loader = document.getElementById('global-loader');
+                if (loader) { loader.style.opacity = '0'; setTimeout(() => { loader.style.display = 'none'; }, 500); }
+
+                // Chart Setup
+                const ctx = document.getElementById('reportChart').getContext('2d');
                 let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)'); // Purple
-                gradient.addColorStop(1, 'rgba(139, 92, 246, 0.01)');
+                gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)'); gradient.addColorStop(1, 'rgba(139, 92, 246, 0.01)');
 
                 new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                        datasets: [{
-                            label: 'Revenue (₹)',
-                            data: [12000, 15000, 11000, 22000],
-                            borderColor: '#8b5cf6',
-                            backgroundColor: gradient,
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#0B0E14',
-                            pointBorderColor: '#8b5cf6',
-                            pointBorderWidth: 2
-                        },
-                        {
-                            label: 'Active Users',
-                            data: [800, 950, 1100, 1250],
-                            borderColor: '#38bdf8', /* Blue */
-                            borderWidth: 3,
-                            borderDash: [5, 5], /* Dashed Line */
-                            tension: 0.4,
-                            pointRadius: 0
-                        }]
+                        datasets: [
+                            {
+                                label: 'Revenue (₹)',
+                                data: revenueData,
+                                borderColor: '#8b5cf6',
+                                backgroundColor: gradient,
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#0B0E14',
+                                pointBorderColor: '#8b5cf6',
+                                pointBorderWidth: 2,
+                                yAxisID: 'y' // <--- Linked to Left Axis
+                            },
+                            {
+                                label: 'Active Users',
+                                data: userData,
+                                borderColor: '#38bdf8',
+                                borderWidth: 3,
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                pointRadius: 4, // Increased radius to make points visible
+                                yAxisID: 'y1' // <--- Linked to Right Axis
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
                         plugins: {
-                            legend: { position: 'top', labels: { color: '#94a3b8' } }
+                            legend: { labels: { color: '#94a3b8' } }
                         },
                         scales: {
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#94a3b8' }
+                            },
+                            // Left Axis (Revenue)
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#8b5cf6', callback: function (value) { return '₹' + value; } }
+                            },
+                            // Right Axis (Users)
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: { drawOnChartArea: false }, // Hide grid lines for this axis
+                                ticks: { color: '#38bdf8', precision: 0 } // No decimals for users
+                            }
                         }
                     }
                 });
+                // Init Data
+                allRows = Array.from(document.querySelectorAll('.log-row'));
+                filteredRows = [...allRows]; // Start with all data
+                renderTable();
             });
+
+            // --- DATE FILTER LOGIC ---
+            function filterData() {
+                const fromStr = document.getElementById('dateFrom').value;
+                const toStr = document.getElementById('dateTo').value;
+
+                // Normalize dates for comparison (Start of day / End of day)
+                const fromDate = fromStr ? new Date(fromStr) : null;
+                if (fromDate) fromDate.setHours(0, 0, 0, 0);
+
+                const toDate = toStr ? new Date(toStr) : null;
+                if (toDate) toDate.setHours(23, 59, 59, 999);
+
+                filteredRows = allRows.filter(row => {
+                    const rowDateStr = row.getAttribute('data-date'); // e.g. "2025-12-16T17:38:00"
+                    if (!rowDateStr) return true; // Safety check
+
+                    const rowDate = new Date(rowDateStr);
+
+                    if (fromDate && rowDate < fromDate) return false;
+                    if (toDate && rowDate > toDate) return false;
+                    return true;
+                });
+
+                currentPage = 1; // Reset pagination
+                renderTable();
+            }
+
+            // --- DOWNLOAD ---
+            function downloadReport(type) {
+                const btn = event.currentTarget;
+                const originalText = btn.innerHTML;
+
+                // 1. Get Dates
+                const fromDate = document.getElementById('dateFrom').value;
+                const toDate = document.getElementById('dateTo').value;
+
+                // 2. Build Query String
+                let queryParams = "";
+                if (fromDate && toDate) {
+                    queryParams = `?startDate=${fromDate}&endDate=${toDate}`;
+                } else if (fromDate) {
+                    queryParams = `?startDate=${fromDate}`;
+                } else if (toDate) {
+                    queryParams = `?endDate=${toDate}`;
+                }
+
+                // 3. Trigger Download
+                btn.innerText = "Downloading...";
+                btn.disabled = true;
+
+                window.location.href = `/admin/reports/export/${type}${queryParams}`;
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }
+
+
+
+            // --- PAGINATION & RENDERING ---
+            const rowsPerPage = 5;
+            let currentPage = 1;
+            let allRows = [];
+            let filteredRows = [];
+
+            function renderTable() {
+                // Hide ALL rows first
+                allRows.forEach(row => row.style.display = 'none');
+
+                // Show Empty Message if needed
+                const noResultsRow = document.getElementById('noResultsRow');
+                if (filteredRows.length === 0) {
+                    if (noResultsRow) noResultsRow.style.display = '';
+                    document.getElementById('paginationControls').style.display = 'none';
+                    return;
+                } else {
+                    if (noResultsRow) noResultsRow.style.display = 'none';
+                    document.getElementById('paginationControls').style.display = 'flex';
+                }
+
+                // Calculate Page Slice on Filtered Data
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                // Show only rows in current slice
+                const currentSlice = filteredRows.slice(start, end);
+                currentSlice.forEach(row => row.style.display = '');
+
+                // Update Controls
+                document.getElementById('prevBtn').disabled = (currentPage === 1);
+                document.getElementById('nextBtn').disabled = (currentPage >= totalPages);
+                document.getElementById('pageNumberDisplay').innerText = `Page ${currentPage} of ${totalPages}`;
+
+                const showEnd = Math.min(end, filteredRows.length);
+                const showStart = filteredRows.length === 0 ? 0 : start + 1;
+                document.getElementById('showingText').innerText = `Showing ${showStart} to ${showEnd} of ${filteredRows.length} entries`;
+            }
+
+            function changePage(dir) {
+                const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                const newPage = currentPage + dir;
+                if (newPage > 0 && newPage <= totalPages) {
+                    currentPage = newPage;
+                    renderTable();
+                }
+            }
         </script>
-
     </section>
-
 </body>
 
 </html>
