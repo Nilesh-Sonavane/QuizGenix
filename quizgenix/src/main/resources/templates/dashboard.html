@@ -11,6 +11,22 @@
             <div class="loading-text">GENERATING QUIZ...</div>
         </div>
 
+        <div th:if="${#strings.toLowerCase(user.activePlan) == 'free'}" id="upgrade-popup" class="modal-overlay">
+            <div class="modal-box upgrade-box">
+                <button class="close-btn" onclick="closeUpgradePopup()">&times;</button>
+                <div class="upgrade-icon">🚀</div>
+                <h2>Unlock Unlimited Power!</h2>
+                <p>You are currently on the <b>Basic Plan</b>.</p>
+                <ul class="feature-list">
+                    <li>✨ Unlimited AI Quizzes</li>
+                    <li>🔥 Access 'Expert' Difficulty</li>
+                    <li>📊 Detailed Analytics & History</li>
+                </ul>
+                <a href="/pricing" class="btn-upgrade">Upgrade to Pro</a>
+                <button class="btn-link" onclick="closeUpgradePopup()">Maybe Later</button>
+            </div>
+        </div>
+
         <style>
             /* --- LOADER STYLES --- */
             .loader-overlay {
@@ -53,6 +69,135 @@
             @keyframes spin {
                 to {
                     transform: rotate(1turn);
+                }
+            }
+
+            /* --- UPGRADE POPUP STYLES --- */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(5px);
+                z-index: 10000;
+                display: none;
+                /* Hidden by default, JS toggles flex */
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease-out forwards;
+            }
+
+            .upgrade-box {
+                background: linear-gradient(145deg, #1e293b, #0f172a);
+                border: 1px solid rgba(139, 92, 246, 0.3);
+                padding: 2.5rem;
+                border-radius: 20px;
+                text-align: center;
+                max-width: 400px;
+                width: 90%;
+                position: relative;
+                box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+                animation: scaleUp 0.4s ease-out forwards;
+            }
+
+            .close-btn {
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: #94a3b8;
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: color 0.3s;
+            }
+
+            .close-btn:hover {
+                color: white;
+            }
+
+            .upgrade-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+            }
+
+            .upgrade-box h2 {
+                color: white;
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .upgrade-box p {
+                color: #94a3b8;
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .feature-list {
+                list-style: none;
+                padding: 0;
+                margin-bottom: 2rem;
+                text-align: left;
+                background: rgba(255, 255, 255, 0.05);
+                padding: 1rem;
+                border-radius: 12px;
+            }
+
+            .feature-list li {
+                color: #e2e8f0;
+                margin-bottom: 8px;
+                font-size: 0.9rem;
+            }
+
+            .btn-upgrade {
+                display: block;
+                width: 100%;
+                padding: 12px;
+                background: linear-gradient(90deg, #8b5cf6, #38bdf8);
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+                border-radius: 50px;
+                transition: transform 0.2s, box-shadow 0.2s;
+                margin-bottom: 1rem;
+            }
+
+            .btn-upgrade:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+            }
+
+            .btn-link {
+                background: none;
+                border: none;
+                color: #64748b;
+                font-size: 0.85rem;
+                cursor: pointer;
+                text-decoration: underline;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes scaleUp {
+                from {
+                    transform: scale(0.9);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scale(1);
+                    opacity: 1;
                 }
             }
 
@@ -401,41 +546,32 @@
 
                 /* SCROLL LOGIC */
                 height: 100%;
-                /* Fills container */
                 min-height: 400px;
-                /* Minimum visual height */
                 max-height: 500px;
-                /* 🛑 LIMIT HEIGHT: adjust this to force scrolling */
                 overflow-y: auto;
-                /* 🖱️ Enable vertical scroll */
 
                 animation: slideUp 0.8s backwards;
             }
 
-            /* --- CUSTOM SCROLLBAR STYLING (For Dark Theme) --- */
+            /* --- CUSTOM SCROLLBAR STYLING --- */
             .timeline-box::-webkit-scrollbar {
                 width: 6px;
-                /* Thin scrollbar */
             }
 
             .timeline-box::-webkit-scrollbar-track {
                 background: rgba(255, 255, 255, 0.02);
-                /* Very subtle track */
                 border-radius: 10px;
                 margin: 10px 0;
-                /* Spacing top/bottom */
             }
 
             .timeline-box::-webkit-scrollbar-thumb {
                 background: rgba(139, 92, 246, 0.3);
-                /* Purple tint */
                 border-radius: 10px;
                 transition: background 0.3s;
             }
 
             .timeline-box::-webkit-scrollbar-thumb:hover {
                 background: rgba(139, 92, 246, 0.6);
-                /* Brighter on hover */
                 cursor: pointer;
             }
 
@@ -819,6 +955,7 @@
         </div>
 
         <script>
+
             /* --- TYPEWRITER LOGIC --- */
             const placeholders = ["e.g., 'General Knowledge'", "e.g., 'Mathematics'", "e.g., 'Science'", "e.g., 'History'", "e.g., 'Geography'", "e.g., 'Computer'", "e.g., 'Programming Fundamentals'", "e.g., 'Logical Reasoning'", "e.g., 'Current Affairs'", "e.g., 'English Grammar'"];
             const inputField = document.querySelector('.ai-input');
@@ -846,7 +983,7 @@
                 document.getElementById('global-loader').style.display = 'flex';
             });
 
-            /* --- AUTO HIDE ERROR MESSAGE --- */
+            /* --- AUTO HIDE ERROR --- */
             const errorBox = document.getElementById('flash-error');
             if (errorBox) {
                 setTimeout(() => {
@@ -855,6 +992,52 @@
                     setTimeout(() => errorBox.remove(), 500);
                 }, 4000);
             }
+
+            /* ---------------------------------------------------- */
+            /* --- UPGRADE POPUP LOGIC (FIXED) --- */
+            /* ---------------------------------------------------- */
+
+            const STORAGE_KEY = 'nextPopupTime_v1'; // Changed key to reset legacy data
+            const INTERVAL_MINUTES = 10;
+            const INTERVAL_MS = INTERVAL_MINUTES * 60 * 1000;
+
+            function closeUpgradePopup() {
+                const popup = document.getElementById('upgrade-popup');
+                if (popup) {
+                    popup.style.display = 'none';
+
+                    // Reset the timer when closed
+                    const nextTime = new Date().getTime() + INTERVAL_MS;
+                    localStorage.setItem(STORAGE_KEY, nextTime);
+                }
+            }
+
+            function checkAndShowPopup() {
+                const popup = document.getElementById('upgrade-popup');
+                if (!popup) return; // User is PRO, element doesn't exist
+
+                const nextTime = localStorage.getItem(STORAGE_KEY);
+                const now = new Date().getTime();
+
+
+
+                if (!nextTime) {
+                    // Option A: Show immediately on first ever login
+                    popup.style.display = 'flex';
+                    return;
+                }
+
+                // 2. Normal check: Has enough time passed?
+                if (now > parseInt(nextTime)) {
+                    popup.style.display = 'flex';
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                setTimeout(checkAndShowPopup, 500);
+
+                setInterval(checkAndShowPopup, 60000);
+            });
         </script>
     </section>
 </body>
