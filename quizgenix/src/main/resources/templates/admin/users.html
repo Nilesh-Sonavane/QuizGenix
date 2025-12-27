@@ -2,42 +2,183 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Users')}">
 
 <head>
+    <style>
+        /* --- LOADER STYLES --- */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 20000;
+            /* High z-index to sit on top */
+            display: none;
+            /* KEY FIX: Hidden by default */
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
 
+        /* Only this class makes it visible */
+        .loader-overlay.active {
+            display: flex !important;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top: 5px solid #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: white;
+            margin-top: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            border-radius: 6px;
+            background: transparent;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
 
     <section>
-        <div id="global-loader" class="loader-overlay">
+        <div id="global-loader" class="loader-overlay" style="display: none;">
             <div class="spinner"></div>
             <div class="loading-text">PROCESSING...</div>
         </div>
 
         <h1>User Management</h1>
 
+        <div id="successAlert" th:if="${successMessage}"
+            style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #22c55e; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+            <div><i class="fas fa-check-circle" style="margin-right: 8px;"></i> <span
+                    th:text="${successMessage}">Success</span></div>
+            <button onclick="this.parentElement.style.display='none'"
+                style="background:none; border:none; color:inherit; cursor:pointer;">&times;</button>
+        </div>
+
+        <div id="errorAlert" th:if="${errorMessage}"
+            style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+            <div><i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> <span
+                    th:text="${errorMessage}">Error</span></div>
+            <button onclick="this.parentElement.style.display='none'"
+                style="background:none; border:none; color:inherit; cursor:pointer;">&times;</button>
+        </div>
+
         <div class="filter-bar">
-            <div class="search-box" style="display: flex; align-items: center; width: 100%;">
+            <div class="search-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="searchInput" placeholder="Search by name, email, or date..."
-                    onkeyup="filterUsers()">
+                <input type="text" id="searchInput" placeholder="Search users..." onkeyup="filterUsers()">
             </div>
-
             <select class="filter-select" id="statusFilter" onchange="filterUsers()">
                 <option value="">All Status</option>
                 <option value="Active">Active</option>
                 <option value="Banned">Banned</option>
-            </select>
-
-            <select class="filter-select" id="planFilter" onchange="filterUsers()">
-                <option value="">All Plans</option>
-                <option value="Free">Basic (Free)</option>
-                <option value="Monthly Plan">Pro (Monthly)</option>
-                <option value="6-Month Plan">Plus (6-Month)</option>
-                <option value="Yearly Plan">Premium (Yearly)</option>
             </select>
         </div>
 
@@ -45,71 +186,52 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>User Details</th>
+                        <th>User</th>
                         <th>Role</th>
-                        <th>Joined Date</th>
+                        <th>Joined</th>
                         <th>Plan</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-
-                <tbody id="tableBody">
+                <tbody>
                     <tr th:each="user : ${users}" class="user-row"
-                        th:data-name="${#strings.toLowerCase(user.firstName + ' ' + user.lastName)}"
-                        th:data-email="${#strings.toLowerCase(user.email)}" th:data-plan="${user.activePlan}"
                         th:data-status="${user.enabled ? 'Active' : 'Banned'}">
-
                         <td>
                             <div class="user-cell">
-                                <img th:src="@{${(user.profileImage == null || user.profileImage == 'profile.png') 
-                                                ? '/images/profile.png' 
-                                                : '/user-photos/' + user.profileImage}}" class="avatar-sm"
-                                    style="object-fit: cover; border-radius: 50%;" alt="User">
-
+                                <div class="avatar-sm"
+                                    th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">U</div>
                                 <div class="user-info">
                                     <span
-                                        th:text="${#strings.capitalizeWords(#strings.toLowerCase(user.firstName + ' ' + user.lastName))}">John
-                                        Doe</span>
-                                    <span class="user-email" th:text="${user.email}">john@example.com</span>
+                                        th:text="${#strings.capitalizeWords(user.firstName + ' ' + user.lastName)}">Name</span>
+                                    <span class="user-email" th:text="${user.email}">email</span>
                                 </div>
                             </div>
                         </td>
-
-                        <td th:text="${user.role != null ? user.role : 'User'}">User</td>
-                        <td th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Dec 10, 2024</td>
-
-                        <td>
-                            <span class="badge"
-                                th:classappend="${user.activePlan == 'Monthly Plan' ? 'bg-pro' : (user.activePlan == 'Yearly Plan' ? 'bg-pro' : (user.activePlan == '6-Month Plan' ? 'bg-pro' : ''))}"
-                                th:text="${user.activePlan == 'Free' ? 'Basic' : 
-                                         (user.activePlan == 'Monthly Plan' ? 'Pro' : 
-                                         (user.activePlan == '6-Month Plan' ? 'Plus' : 
-                                         (user.activePlan == 'Yearly Plan' ? 'Premium' : user.activePlan)))}">
-                                Free
-                            </span>
-                        </td>
-
+                        <td th:text="${user.role}">Role</td>
+                        <td th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Date</td>
+                        <td><span class="badge" th:classappend="${user.activePlan == 'Free' ? '' : 'bg-pro'}"
+                                th:text="${user.activePlan}">Plan</span></td>
                         <td>
                             <span th:if="${user.enabled}" class="badge bg-active">Active</span>
                             <span th:unless="${user.enabled}" class="badge bg-banned">Banned</span>
                         </td>
-
                         <td>
                             <div class="action-icons">
-                                <button type="button" class="icon-btn" th:classappend="${!user.enabled} ? 'block' : ''"
-                                    th:title="${user.enabled} ? 'Block User' : 'Unblock User'"
-                                    th:onclick="'showModal(' + ${user.id} + ', \'' + ${user.enabled} + '\')'">
-
-                                    <svg th:if="${user.enabled}" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
+                                <button th:if="${user.enabled}" class="icon-btn" title="Block User"
+                                    th:onclick="'openStatusModal(' + ${user.id} + ', true)'">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #ef4444;">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                                     </svg>
-                                    <svg th:unless="${user.enabled}" width="16" height="16" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round">
+                                </button>
+                                <button th:unless="${user.enabled}" class="icon-btn" title="Activate User"
+                                    th:onclick="'openStatusModal(' + ${user.id} + ', false)'">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #22c55e;">
                                         <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
                                         <path d="M21 3v5h-5"></path>
                                     </svg>
@@ -117,21 +239,11 @@
                             </div>
                         </td>
                     </tr>
-
-                    <tr th:if="${#lists.isEmpty(users)}">
-                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 2rem;">No users found in
-                            database.</td>
-                    </tr>
-
-                    <tr id="noResultsRow" style="display: none;">
-                        <td colspan="6" style="text-align: center; color: #94a3b8; padding: 2rem;">No users match your
-                            filters.</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
 
-        <div id="confirmModal" class="modal-overlay">
+        <div id="statusModal" class="modal-overlay">
             <div class="modal-box">
                 <div class="modal-icon">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -143,103 +255,85 @@
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
                 </div>
-                <h3 class="modal-title">Change User Status?</h3>
-                <p class="modal-text" id="modalMessage">Are you sure you want to perform this action?</p>
-
+                <h3 class="modal-title">Confirm Action</h3>
+                <p class="modal-text" id="modalMessage">Are you sure?</p>
                 <div class="modal-actions">
-                    <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                    <a id="confirmLink" href="#" class="btn-confirm" onclick="showLoader()">Yes, Change it</a>
+                    <button class="btn-cancel" onclick="closeStatusModal()">Cancel</button>
+                    <button id="confirmBtn" class="btn-confirm" onclick="proceedToggle()">Confirm</button>
                 </div>
             </div>
         </div>
 
         <script>
-            // --- 0. LOADER LOGIC (UPDATED ID) ---
+            let toggleUrl = "";
 
-            // Hide loader on page load
-            window.addEventListener('load', function () {
-                const loader = document.getElementById('global-loader');
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 500);
-            });
+            // --- 1. MODAL LOGIC ---
+            function openStatusModal(userId, isEnabled) {
+                toggleUrl = "/admin/users/toggle-status/" + userId;
 
-            // Show loader manually (when action is confirmed)
-            function showLoader() {
-                const loader = document.getElementById('global-loader');
-                loader.style.display = 'flex'; // Use flex to center content
-                setTimeout(() => {
-                    loader.style.opacity = '1';
-                }, 10);
+                const modal = document.getElementById('statusModal');
+                const message = document.getElementById('modalMessage');
+                const confirmBtn = document.getElementById('confirmBtn');
+
+                if (isEnabled) {
+                    message.innerText = "This user is Active. Do you want to BLOCK them?";
+                    confirmBtn.innerText = "Yes, Block User";
+                    confirmBtn.style.background = "#ef4444";
+                } else {
+                    message.innerText = "This user is Banned. Do you want to ACTIVATE them?";
+                    confirmBtn.innerText = "Yes, Activate User";
+                    confirmBtn.style.background = "#22c55e";
+                }
+                modal.classList.add('show');
             }
 
-            // --- 1. FILTER FUNCTION ---
+            function closeStatusModal() {
+                document.getElementById('statusModal').classList.remove('show');
+            }
+
+            function proceedToggle() {
+                if (toggleUrl) {
+                    closeStatusModal();
+                    // SHOW LOADER MANUALLY VIA CLASS
+                    const loader = document.getElementById('global-loader');
+                    loader.classList.add('active'); // Add class to show flex
+                    loader.style.display = 'flex';  // Force style just in case
+
+                    window.location.href = toggleUrl;
+                }
+            }
+
+            // --- 2. FILTER ---
             function filterUsers() {
-                const input = document.getElementById('searchInput').value.toLowerCase();
-                const statusFilter = document.getElementById('statusFilter').value;
-                const planFilter = document.getElementById('planFilter').value;
-                const rows = document.querySelectorAll('.user-row');
-                let visibleCount = 0;
+                let input = document.getElementById('searchInput').value.toLowerCase();
+                let status = document.getElementById('statusFilter').value;
+                let rows = document.querySelectorAll('.user-row');
 
                 rows.forEach(row => {
-                    const rowStatus = row.getAttribute('data-status');
-                    const rowPlan = row.getAttribute('data-plan');
-                    const allRowText = row.innerText.toLowerCase();
-
-                    const matchesKeyword = allRowText.includes(input);
-                    const matchesStatus = (statusFilter === "") || (rowStatus === statusFilter);
-                    const matchesPlan = (planFilter === "") || (rowPlan === planFilter);
-
-                    if (matchesKeyword && matchesStatus && matchesPlan) {
-                        row.style.display = "";
-                        visibleCount++;
-                    } else {
-                        row.style.display = "none";
-                    }
+                    let text = row.innerText.toLowerCase();
+                    let rowStatus = row.getAttribute('data-status');
+                    let matchText = text.includes(input);
+                    let matchStatus = (status === "") || (rowStatus === status);
+                    row.style.display = (matchText && matchStatus) ? "" : "none";
                 });
-
-                const noResultsRow = document.getElementById('noResultsRow');
-                noResultsRow.style.display = (visibleCount === 0 && rows.length > 0) ? "" : "none";
             }
 
-            // --- 2. MODAL FUNCTIONS ---
-            function showModal(userId, isEnabled) {
-                const modal = document.getElementById('confirmModal');
-                const message = document.getElementById('modalMessage');
-                const confirmLink = document.getElementById('confirmLink');
+            // --- 3. UTILS ---
+            window.onload = function () {
+                // Ensure Loader is HIDDEN on load
+                document.getElementById('global-loader').classList.remove('active');
+                document.getElementById('global-loader').style.display = 'none';
 
-                if (isEnabled === 'true' || isEnabled === true) {
-                    message.innerText = "This user is currently Active. Do you want to Block them?";
-                    confirmLink.innerText = "Yes, Block User";
-                    confirmLink.style.background = "#ef4444";
-                } else {
-                    message.innerText = "This user is currently Banned. Do you want to Activate them?";
-                    confirmLink.innerText = "Yes, Activate User";
-                    confirmLink.style.background = "#22c55e";
-                }
-
-                confirmLink.href = "/admin/users/toggle-status/" + userId;
-
-                modal.style.display = "flex";
-                setTimeout(() => {
-                    document.querySelector('.modal-box').classList.add('active');
-                }, 10);
-            }
-
-            function closeModal() {
-                const modal = document.getElementById('confirmModal');
-                document.querySelector('.modal-box').classList.remove('active');
-                setTimeout(() => {
-                    modal.style.display = "none";
-                }, 200);
-            }
+                // Auto hide alerts
+                const alerts = document.querySelectorAll('#successAlert, #errorAlert');
+                alerts.forEach(alert => {
+                    setTimeout(() => { alert.style.display = 'none'; }, 4000);
+                });
+            };
 
             window.onclick = function (event) {
-                const modal = document.getElementById('confirmModal');
-                if (event.target == modal) {
-                    closeModal();
-                }
+                const modal = document.getElementById('statusModal');
+                if (event.target == modal) closeStatusModal();
             }
         </script>
 

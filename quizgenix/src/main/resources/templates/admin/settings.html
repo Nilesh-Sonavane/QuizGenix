@@ -7,10 +7,75 @@
 <body>
 
     <section>
+
+        <div id="alertMessage" class="message-container" th:if="${param.success != null or param.error != null}">
+
+            <p class="msg-success" th:if="${param.success != null}">
+                <span th:if="${param.success[0] == 'profile'}">&#10004; Profile updated successfully.</span>
+                <span th:if="${param.success[0] == 'password'}">&#10004; Password changed successfully.</span>
+            </p>
+
+            <p class="msg-error" th:if="${param.error != null}">
+                <span th:if="${param.error[0] == 'invalid_current'}">&#9888; Incorrect current password.</span>
+
+                <span th:if="${param.error[0] == 'weak_password'}">&#9888; Password must be 8+ chars, with Upper, Lower,
+                    Digit & Special char.</span>
+
+                <span th:if="${param.error[0] == 'mismatch'}">&#9888; New passwords do not match.</span>
+                <span th:if="${param.error[0] == 'upload_failed'}">&#9888; Image upload failed.</span>
+                <span th:if="${param.error[0] == 'file_too_large'}">&#9888; File is too large (Max 10MB).</span>
+            </p>
+
+        </div>
         <h1>Admin Settings</h1>
-        <p class="welcome-text">Manage your profile and system configurations.</p>
+        <p class="welcome-text">Manage your profile details and security.</p>
 
         <style>
+            /* --- MESSAGE STYLES --- */
+            .message-container {
+                margin-bottom: 1.5rem;
+                padding: 1rem;
+                border-radius: 10px;
+                animation: fadeIn 0.5s ease-out;
+                opacity: 1;
+                transition: opacity 0.5s ease-out;
+            }
+
+            .msg-success {
+                color: #4ade80;
+                /* Bright Green */
+                font-weight: 600;
+                margin: 0;
+                background: rgba(34, 197, 94, 0.1);
+                padding: 10px 15px;
+                border-radius: 8px;
+                border: 1px solid rgba(34, 197, 94, 0.2);
+            }
+
+            .msg-error {
+                color: #f87171;
+                /* Bright Red */
+                font-weight: 600;
+                margin: 0;
+                background: rgba(239, 68, 68, 0.1);
+                padding: 10px 15px;
+                border-radius: 8px;
+                border: 1px solid rgba(239, 68, 68, 0.2);
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* --- LAYOUT CSS --- */
             .settings-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -127,75 +192,6 @@
                 background: #7c3aed;
                 transform: translateY(-2px);
             }
-
-            /* Toggles */
-            .toggle-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            }
-
-            .toggle-row:last-child {
-                border-bottom: none;
-            }
-
-            .toggle-info h4 {
-                color: white;
-                font-size: 0.95rem;
-                margin-bottom: 2px;
-            }
-
-            .toggle-info p {
-                color: #94a3b8;
-                font-size: 0.8rem;
-            }
-
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 44px;
-                height: 24px;
-            }
-
-            .switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(255, 255, 255, 0.1);
-                transition: .4s;
-                border-radius: 34px;
-            }
-
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 18px;
-                width: 18px;
-                left: 3px;
-                bottom: 3px;
-                background-color: white;
-                transition: .4s;
-                border-radius: 50%;
-            }
-
-            input:checked+.slider {
-                background-color: #22c55e;
-            }
-
-            input:checked+.slider:before {
-                transform: translateX(20px);
-            }
         </style>
 
         <div class="settings-grid">
@@ -206,19 +202,22 @@
                     <p>Manage your admin account details.</p>
                 </div>
 
-                <form th:action="@{/update-profile}" method="post">
-
+                <form th:action="@{/admin/update-profile}" method="post" enctype="multipart/form-data">
                     <div class="profile-header">
-                        <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                            th:src="@{'/images/' + ${user.profileImage}}" class="big-avatar" alt="Profile">
-
-                        <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                            class="big-avatar">
-                            <span th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</span>
-                        </div>
+                        <img id="profilePreview" th:src="@{${(user.profileImage == null || user.profileImage == 'profile.png') 
+                     ? '/images/profile.png' 
+                     : '/user-photos/' + user.profileImage}}" class="big-avatar" alt="Profile"
+                            style="object-fit: cover; border-radius: 50%;">
 
                         <div>
-                            <button type="button" class="upload-btn">Change Photo</button>
+                            <input type="file" id="profileImageInput" name="imageFile" style="display: none;"
+                                accept="image/*" onchange="previewImage(this)">
+
+                            <button type="button" class="upload-btn"
+                                onclick="document.getElementById('profileImageInput').click()">
+                                Change Photo
+                            </button>
+
                             <p style="font-size: 0.75rem; color: #52525b; margin-top: 5px;">Admin Badge Visible</p>
                         </div>
                     </div>
@@ -243,79 +242,61 @@
 
             <div class="settings-card">
                 <div class="card-header">
-                    <h3>System Configuration</h3>
-                    <p>Global settings for the QuizGenix platform.</p>
-                </div>
-
-                <div class="toggle-row">
-                    <div class="toggle-info">
-                        <h4>Maintenance Mode</h4>
-                        <p>Disable access for regular users.</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-row">
-                    <div class="toggle-info">
-                        <h4>Allow New Registrations</h4>
-                        <p>Enable or disable sign-up form.</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-row">
-                    <div class="toggle-info">
-                        <h4>Email Notifications</h4>
-                        <p>Send system alerts to admins.</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label>Default User Plan</label>
-                    <select class="form-input" style="background-color: rgba(0,0,0,0.3);">
-                        <option value="Basic">Basic (Free)</option>
-                        <option value="Trial">7-Day Trial</option>
-                    </select>
-                </div>
-
-                <button class="btn-save" style="background: #38bdf8; margin-top: 10px;">Save System Config</button>
-            </div>
-
-            <div class="settings-card">
-                <div class="card-header">
                     <h3>Security</h3>
                     <p>Update your password.</p>
                 </div>
 
-                <form>
+                <form th:action="@{/admin/update-password}" method="post">
                     <div class="form-group">
                         <label>Current Password</label>
-                        <input type="password" class="form-input" placeholder="••••••••">
+                        <input type="password" name="currentPassword" class="form-input" placeholder="••••••••">
                     </div>
                     <div class="form-group">
                         <label>New Password</label>
-                        <input type="password" class="form-input" placeholder="••••••••">
+                        <input type="password" name="newPassword" class="form-input" placeholder="••••••••">
                     </div>
                     <div class="form-group">
                         <label>Confirm Password</label>
-                        <input type="password" class="form-input" placeholder="••••••••">
+                        <input type="password" name="confirmPassword" class="form-input" placeholder="••••••••">
                     </div>
-                    <button type="button" class="btn-save" style="background: rgba(239, 68, 68, 0.8);">Update
+                    <button type="submit" class="btn-save" style="background: rgba(239, 68, 68, 0.8);">Update
                         Password</button>
                 </form>
             </div>
 
         </div>
+
+        <script>
+            // 1. Image Preview
+            function previewImage(input) {
+                var file = input.files[0];
+                var preview = document.getElementById('profilePreview');
+                var defaultAvatar = document.getElementById('defaultAvatar');
+
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'flex';
+                        if (defaultAvatar) defaultAvatar.style.display = 'none';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            // 2. Auto-Hide Message after 3 seconds
+            window.onload = function () {
+                var alertMsg = document.getElementById('alertMessage');
+                if (alertMsg) {
+                    setTimeout(function () {
+                        alertMsg.style.opacity = '0'; // Fade out
+                        setTimeout(function () {
+                            alertMsg.style.display = 'none'; // Remove from flow
+                        }, 500);
+                    }, 3000); // 3 seconds delay
+                }
+            };
+        </script>
 
     </section>
 

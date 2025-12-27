@@ -42,7 +42,9 @@ public class SecurityConfig {
                                                                 "/verify",
                                                                 "/forgot-password/**",
                                                                 "/new-password",
-                                                                "/pricing")
+                                                                "/pricing",
+                                                                "/about",
+                                                                "/contact")
                                                 .permitAll()
 
                                                 // 4. Protected Pages

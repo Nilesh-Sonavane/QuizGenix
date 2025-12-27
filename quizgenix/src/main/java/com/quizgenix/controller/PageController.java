@@ -15,12 +15,17 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.quizgenix.model.ContactMessage;
 import com.quizgenix.model.Quiz;
 import com.quizgenix.model.User;
 import com.quizgenix.repository.QuizRepository;
 import com.quizgenix.repository.UserRepository;
+import com.quizgenix.service.ContactService;
 import com.quizgenix.service.UserService;
 
 @Controller
@@ -34,6 +39,9 @@ public class PageController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ContactService contactService;
 
     // 🟢 1. UPDATED HELPER: Returns 'User' so we can use it in logic
     private User addUserToModel(Model model, Principal principal) {
@@ -55,6 +63,37 @@ public class PageController {
     public String home(Model model, Principal principal) {
         addUserToModel(model, principal);
         return "index";
+    }
+
+    @GetMapping("/about")
+    public String about(Model model, Principal principal) {
+        addUserToModel(model, principal);
+        return "aboutus";
+    }
+
+    @GetMapping("/contact")
+    public String showContactPage(Model model, Principal principal) {
+        if (principal != null) {
+            model.addAttribute("isLoggedIn", true);
+            User user = userService.findByEmail(principal.getName());
+            model.addAttribute("user", user);
+        } else {
+            model.addAttribute("isLoggedIn", false);
+        }
+
+        model.addAttribute("contactMessage", new ContactMessage());
+        return "contactus";
+    }
+
+    @PostMapping("/contact")
+    public String handleContactForm(@ModelAttribute ContactMessage contactMessage,
+            RedirectAttributes redirectAttributes) {
+        // Save using Service
+        contactService.saveMessage(contactMessage);
+
+        // Add Success Alert
+        redirectAttributes.addFlashAttribute("successMessage", "Thank you! Your message has been received.");
+        return "redirect:/contact";
     }
 
     // 🟢 2. UPDATED DASHBOARD (Now checks Plan Expiry too)
@@ -237,12 +276,12 @@ public class PageController {
         return "pricing";
     }
 
-    @GetMapping("/admin/settings")
-    public String adminSettings(Model model, Principal principal) {
-        if (principal != null) {
-            User user = userService.findByEmail(principal.getName());
-            model.addAttribute("user", user);
-        }
-        return "admin/settings";
-    }
+    // @GetMapping("/admin/settings")
+    // public String adminSettings(Model model, Principal principal) {
+    // if (principal != null) {
+    // User user = userService.findByEmail(principal.getName());
+    // model.addAttribute("user", user);
+    // }
+    // return "admin/settings";
+    // }
 }

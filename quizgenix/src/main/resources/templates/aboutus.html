@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizGenix | Next Gen Learning</title>
+    <title>About Us | QuizGenix</title>
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- THEME SETTINGS --- */
+        /* --- EXACT THEME FROM INDEX.HTML --- */
         :root {
             --bg-dark: #0B0E14;
             --card-bg: rgba(255, 255, 255, 0.05);
@@ -260,101 +260,150 @@
             margin: 5px 0;
         }
 
-        /* --- HERO SECTION --- */
-        .hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+        /* --- CONTENT STYLES --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
             padding: 4rem 2rem;
+            width: 100%;
+            flex: 1;
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, white, #cbd5e1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .about-intro {
+            text-align: center;
+            margin-bottom: 5rem;
             animation: slideUp 0.8s ease-out;
         }
 
-        .hero h1 span {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .about-intro h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
         }
 
-        .hero p {
+        .about-intro h1 span {
+            color: var(--accent);
+        }
+
+        .about-intro p {
             font-size: 1.2rem;
+            line-height: 1.8;
             color: var(--text-muted);
-            max-width: 600px;
-            margin-bottom: 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .features-section {
+            margin-bottom: 5rem;
             animation: slideUp 0.8s ease-out 0.2s backwards;
         }
 
-        /* --- CARDS --- */
-        .cards-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: white;
         }
 
-        .card {
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
-            padding: 2rem;
-            border-radius: 16px;
-            width: 280px;
-            text-align: left;
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
             transition: 0.3s;
             backdrop-filter: blur(5px);
-            animation: slideUp 0.8s ease-out backwards;
         }
 
-        .card:nth-child(1) {
-            animation-delay: 0.4s;
-        }
-
-        .card:nth-child(2) {
-            animation-delay: 0.5s;
-        }
-
-        .card:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-
-        .card:hover {
+        .feature-card:hover {
             transform: translateY(-10px);
             border-color: var(--primary);
             background: rgba(255, 255, 255, 0.08);
         }
 
-        .card-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+        .icon-box {
+            font-size: 2.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem auto;
+            border: 1px solid var(--glass-border);
+            color: var(--primary);
         }
 
-        .card h3 {
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: white;
         }
 
-        .card p {
-            font-size: 0.9rem;
+        .feature-card p {
+            font-size: 0.95rem;
             color: var(--text-muted);
+            line-height: 1.6;
         }
 
-        /* --- FOOTER CSS --- */
+        .dev-section {
+            text-align: center;
+            animation: slideUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .dev-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(139, 92, 246, 0.05));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dev-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .dev-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dev-card span {
+            color: var(--accent);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .dev-card p {
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* --- THEMED FOOTER --- */
         .modern-footer {
             margin-top: 5rem;
             border-top: 1px solid var(--glass-border);
@@ -415,6 +464,7 @@
             font-size: 0.9rem;
         }
 
+        /* Hover effect helper for inline elements */
         .social-hover:hover {
             background: #8b5cf6 !important;
             border-color: #8b5cf6 !important;
@@ -439,9 +489,6 @@
         }
 
         @media(max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
 
             .nav-items,
             .nav-username {
@@ -471,8 +518,8 @@
             <span>QuizGenix</span>
         </a>
         <div class="nav-items">
-            <a th:href="@{/}" style="color: var(--accent);">Home</a>
-            <a th:href="@{/about}">About Us</a>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/about}" style="color: var(--accent);">About Us</a>
             <a th:href="@{/contact}">Contact Us</a>
             <a th:href="@{/pricing}">Pricing</a>
         </div>
@@ -486,12 +533,9 @@
                     class="nav-avatar-img" alt="Avatar">
 
                 <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">
-                    A
-                </div>
+                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</div>
 
-                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">Alex Dev</span>
-
+                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">User</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
                     <path d="M6 9l6 6 6-6" />
@@ -515,36 +559,69 @@
         </div>
     </nav>
 
-    <section class="hero">
-        <h1>Smart Quizzes, <br> Powered by <span>AI Intelligence</span></h1>
-        <p>Stop taking boring tests. Experience adaptive learning that evolves with your knowledge level using our
-            advanced neural engine.</p>
+    <div class="container">
 
-        <div class="cards-container">
-            <div class="card">
-                <div class="card-icon">🚀</div>
-                <h3>Instant Generation</h3>
-                <p>Type a topic like "Java Streams" and get a unique quiz in seconds.</p>
+        <section class="about-intro">
+            <h1>Reimagining <span>Learning</span></h1>
+            <p>
+                QuizGenix believes that education should be exciting, personal, and accessible to everyone.
+                We are moving away from the era of static, boring tests and entering a future where curiosity leads the
+                way.
+                Our mission is to help you learn faster, retain more, and enjoy the journey of self-improvement.
+            </p>
+        </section>
+
+        <section class="features-section">
+            <h2 class="section-title">Why We Exist</h2>
+            <div class="features-grid">
+
+                <div class="feature-card">
+                    <div class="icon-box">🌱</div>
+                    <h3>Personalized Growth</h3>
+                    <p>No two learners are the same. We adapt the difficulty to match your pace, ensuring you are always
+                        challenged but never overwhelmed.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-box">🌍</div>
+                    <h3>Limitless Knowledge</h3>
+                    <p>From History to Science, Pop Culture to Coding—explore a universe of topics instantly. If you can
+                        name it, you can learn it.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-box">📈</div>
+                    <h3>Track Mastery</h3>
+                    <p>Watch your skills grow over time. We provide visual insights into your progress, helping you turn
+                        weaknesses into strengths.</p>
+                </div>
+
             </div>
-            <div class="card">
-                <div class="card-icon">🧠</div>
-                <h3>Adaptive AI</h3>
-                <p>The AI analyzes your weak points and asks tougher questions as you improve.</p>
+        </section>
+
+        <section class="dev-section">
+            <h2 class="section-title">The Creator</h2>
+            <div class="dev-card">
+                <div class="dev-avatar">NS</div>
+                <h2>Nilesh Sonavane</h2>
+                <span>Founder & Developer</span>
+                <p>
+                    "I created QuizGenix because I believe the best way to learn is by doing.
+                    Education shouldn't just be about memorizing facts; it should be about sparking curiosity.
+                    I wanted to build a space where anyone, anywhere, can test their knowledge and discover something
+                    new every day."
+                </p>
             </div>
-            <div class="card">
-                <div class="card-icon">🏆</div>
-                <h3>Global Rank</h3>
-                <p>Compete with developers worldwide and showcase your badges.</p>
-            </div>
-        </div>
-    </section>
+        </section>
+
+    </div>
 
     <footer class="modern-footer">
         <div class="footer-grid">
 
             <div class="footer-col">
                 <h3>QuizGenix</h3>
-                <p>Empowering learners with AI-driven assessments. Join the future of education today.</p>
+                <p>Empowering learners with adaptive assessments. Join the future of education today.</p>
             </div>
 
             <div class="footer-col">
@@ -600,30 +677,21 @@
     </footer>
 
     <script>
-        // Toggle Dropdown on Click (for Mobile)
         document.addEventListener('DOMContentLoaded', function () {
             const trigger = document.querySelector('.user-trigger');
             const menu = document.querySelector('.dropdown-menu');
-
             if (trigger && menu) {
                 trigger.addEventListener('click', function (e) {
                     e.stopPropagation();
                     if (menu.style.visibility === 'visible') {
-                        menu.style.opacity = '0';
-                        menu.style.visibility = 'hidden';
-                        menu.style.transform = 'translateY(-10px)';
+                        menu.style.opacity = '0'; menu.style.visibility = 'hidden'; menu.style.transform = 'translateY(-10px)';
                     } else {
-                        menu.style.opacity = '1';
-                        menu.style.visibility = 'visible';
-                        menu.style.transform = 'translateY(0)';
+                        menu.style.opacity = '1'; menu.style.visibility = 'visible'; menu.style.transform = 'translateY(0)';
                     }
                 });
-
                 document.addEventListener('click', function (e) {
                     if (!trigger.contains(e.target)) {
-                        menu.style.opacity = '0';
-                        menu.style.visibility = 'hidden';
-                        menu.style.transform = 'translateY(-10px)';
+                        menu.style.opacity = '0'; menu.style.visibility = 'hidden'; menu.style.transform = 'translateY(-10px)';
                     }
                 });
             }

@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizGenix | Next Gen Learning</title>
+    <title>Contact Us | QuizGenix</title>
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- THEME SETTINGS --- */
+        /* --- EXACT THEME FROM INDEX.HTML --- */
         :root {
             --bg-dark: #0B0E14;
             --card-bg: rgba(255, 255, 255, 0.05);
@@ -41,16 +41,6 @@
         }
 
         /* --- ANIMATIONS --- */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
         @keyframes slideDown {
             from {
                 transform: translateY(-30px);
@@ -71,6 +61,16 @@
 
             to {
                 transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
                 opacity: 1;
             }
         }
@@ -260,105 +260,151 @@
             margin: 5px 0;
         }
 
-        /* --- HERO SECTION --- */
-        .hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+        /* --- CONTACT PAGE STYLES --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
             padding: 4rem 2rem;
+            width: 100%;
+            flex: 1;
         }
 
-        .hero h1 {
-            font-size: 4rem;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, white, #cbd5e1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .contact-header {
+            text-align: center;
+            margin-bottom: 4rem;
             animation: slideUp 0.8s ease-out;
         }
 
-        .hero h1 span {
+        .contact-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-header h1 span {
             background: linear-gradient(to right, var(--primary), var(--accent));
             -webkit-background-clip: text;
-            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .hero p {
-            font-size: 1.2rem;
+        .contact-header p {
             color: var(--text-muted);
+            font-size: 1.1rem;
             max-width: 600px;
-            margin-bottom: 3rem;
+            margin: 0 auto;
+        }
+
+        /* Grid Layout */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
             animation: slideUp 0.8s ease-out 0.2s backwards;
         }
 
-        /* --- CARDS --- */
-        .cards-container {
+        /* Left Side: Info */
+        .contact-info {
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
             justify-content: center;
+            gap: 2rem;
         }
 
-        .card {
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .info-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+            color: white;
+        }
+
+        .info-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Right Side: Form */
+        .contact-form-card {
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
-            padding: 2rem;
-            border-radius: 16px;
-            width: 280px;
-            text-align: left;
-            transition: 0.3s;
-            backdrop-filter: blur(5px);
-            animation: slideUp 0.8s ease-out backwards;
+            padding: 2.5rem;
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
         }
 
-        .card:nth-child(1) {
-            animation-delay: 0.4s;
+        .form-group {
+            margin-bottom: 1.5rem;
         }
 
-        .card:nth-child(2) {
-            animation-delay: 0.5s;
-        }
-
-        .card:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .card-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            display: inline-block;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-        }
-
-        .card h3 {
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .card p {
-            font-size: 0.9rem;
+        .form-label {
+            display: block;
             color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
-        /* --- FOOTER CSS --- */
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
+        }
+
+        /* --- MODERN FOOTER --- */
         .modern-footer {
             margin-top: 5rem;
             border-top: 1px solid var(--glass-border);
-            background: transparent;
             padding: 4rem 2rem 1.5rem 2rem;
         }
 
@@ -423,6 +469,11 @@
         }
 
         @media(max-width: 900px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
             .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 2rem;
@@ -439,9 +490,6 @@
         }
 
         @media(max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
 
             .nav-items,
             .nav-username {
@@ -455,6 +503,10 @@
             .dropdown-menu {
                 right: -10px;
                 width: 180px;
+            }
+
+            .contact-header h1 {
+                font-size: 2.5rem;
             }
         }
     </style>
@@ -471,9 +523,9 @@
             <span>QuizGenix</span>
         </a>
         <div class="nav-items">
-            <a th:href="@{/}" style="color: var(--accent);">Home</a>
+            <a th:href="@{/}">Home</a>
             <a th:href="@{/about}">About Us</a>
-            <a th:href="@{/contact}">Contact Us</a>
+            <a th:href="@{/contact}" style="color: var(--accent);">Contact Us</a>
             <a th:href="@{/pricing}">Pricing</a>
         </div>
 
@@ -486,12 +538,9 @@
                     class="nav-avatar-img" alt="Avatar">
 
                 <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">
-                    A
-                </div>
+                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</div>
 
-                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">Alex Dev</span>
-
+                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">User</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
                     <path d="M6 9l6 6 6-6" />
@@ -515,29 +564,72 @@
         </div>
     </nav>
 
-    <section class="hero">
-        <h1>Smart Quizzes, <br> Powered by <span>AI Intelligence</span></h1>
-        <p>Stop taking boring tests. Experience adaptive learning that evolves with your knowledge level using our
-            advanced neural engine.</p>
+    <div class="container">
 
-        <div class="cards-container">
-            <div class="card">
-                <div class="card-icon">🚀</div>
-                <h3>Instant Generation</h3>
-                <p>Type a topic like "Java Streams" and get a unique quiz in seconds.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🧠</div>
-                <h3>Adaptive AI</h3>
-                <p>The AI analyzes your weak points and asks tougher questions as you improve.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🏆</div>
-                <h3>Global Rank</h3>
-                <p>Compete with developers worldwide and showcase your badges.</p>
-            </div>
+        <div class="contact-header">
+            <h1>Get in <span>Touch</span></h1>
+            <p>Have questions, feedback, or just want to say hello? We'd love to hear from you.</p>
         </div>
-    </section>
+
+        <div class="contact-grid">
+
+            <div class="contact-info">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="info-content">
+                        <h3>Email Us</h3>
+                        <p>support@quizgenix.com</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="info-content">
+                        <h3>Our HQ</h3>
+                        <p>Tech Park, Bangalore, India</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-clock"></i></div>
+                    <div class="info-content">
+                        <h3>Working Hours</h3>
+                        <p>Mon - Fri: 9am - 6pm</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-card">
+                <form th:action="@{/contact}" th:object="${contactMessage}" method="post">
+
+                    <div th:if="${successMessage}"
+                        style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #22c55e; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                        <span th:text="${successMessage}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" th:field="*{fullName}" class="form-control" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" th:field="*{email}" class="form-control" placeholder="john@example.com"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea th:field="*{message}" class="form-control" placeholder="How can we help you?"
+                            required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Send Message</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
 
     <footer class="modern-footer">
         <div class="footer-grid">
@@ -595,35 +687,27 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Next Gen Learning.</p>
+            <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> QuizGenix. Engineered in
+                India.</p>
         </div>
     </footer>
 
     <script>
-        // Toggle Dropdown on Click (for Mobile)
         document.addEventListener('DOMContentLoaded', function () {
             const trigger = document.querySelector('.user-trigger');
             const menu = document.querySelector('.dropdown-menu');
-
             if (trigger && menu) {
                 trigger.addEventListener('click', function (e) {
                     e.stopPropagation();
                     if (menu.style.visibility === 'visible') {
-                        menu.style.opacity = '0';
-                        menu.style.visibility = 'hidden';
-                        menu.style.transform = 'translateY(-10px)';
+                        menu.style.opacity = '0'; menu.style.visibility = 'hidden'; menu.style.transform = 'translateY(-10px)';
                     } else {
-                        menu.style.opacity = '1';
-                        menu.style.visibility = 'visible';
-                        menu.style.transform = 'translateY(0)';
+                        menu.style.opacity = '1'; menu.style.visibility = 'visible'; menu.style.transform = 'translateY(0)';
                     }
                 });
-
                 document.addEventListener('click', function (e) {
                     if (!trigger.contains(e.target)) {
-                        menu.style.opacity = '0';
-                        menu.style.visibility = 'hidden';
-                        menu.style.transform = 'translateY(-10px)';
+                        menu.style.opacity = '0'; menu.style.visibility = 'hidden'; menu.style.transform = 'translateY(-10px)';
                     }
                 });
             }

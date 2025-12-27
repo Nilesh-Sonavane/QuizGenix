@@ -13,6 +13,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
@@ -48,7 +50,267 @@
             overflow-x: hidden;
         }
 
-        /* --- LOADER --- */
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(1turn);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* --- GLOWING ORBS --- */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .orb-1 {
+            top: -10%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .orb-2 {
+            bottom: 10%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            animation: float 7s infinite ease-in-out 1s;
+        }
+
+        /* --- NAVBAR STYLES (From Index) --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 8%;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand img {
+            height: 40px;
+        }
+
+        .brand span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-items a {
+            color: var(--text-muted);
+            margin-left: 2rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .nav-items a:hover {
+            color: var(--accent);
+        }
+
+        .btn-glow {
+            padding: 0.6rem 1.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-glow:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+        }
+
+        /* --- DROPDOWN MENU --- */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        .user-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .user-trigger:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+        }
+
+        .nav-avatar-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-username {
+            font-weight: 600;
+            color: white;
+            font-size: 0.95rem;
+            text-transform: capitalize;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            width: 200px;
+            background: #1e293b;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: 0.3s ease;
+            z-index: 200;
+        }
+
+        .user-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 5px 0;
+        }
+
+        /* --- LOADER & MODALS (Pricing Specific) --- */
         .loader-overlay {
             position: fixed;
             top: 0;
@@ -78,7 +340,6 @@
 
         .loading-text {
             color: white;
-            font-family: 'Outfit', sans-serif;
             font-weight: 500;
             font-size: 1rem;
             letter-spacing: 1px;
@@ -86,7 +347,6 @@
             animation: pulse 2s infinite ease-in-out;
         }
 
-        /* --- MODAL --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -101,7 +361,6 @@
             backdrop-filter: blur(5px);
             animation: fadeIn 0.3s ease-out;
             padding: 20px;
-            /* Added padding for mobile safety */
         }
 
         .modal-box {
@@ -166,48 +425,7 @@
             transform: translateY(-2px);
         }
 
-        /* --- UI ELEMENTS --- */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 8%;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            animation: fadeIn 1s;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .brand img {
-            height: 40px;
-        }
-
-        .btn-login {
-            padding: 0.6rem 1.5rem;
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            color: white;
-            text-decoration: none;
-            transition: 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .btn-login:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
+        /* --- PRICING GRID STYLES --- */
         .pricing-header {
             text-align: center;
             padding: 4rem 2rem 3rem 2rem;
@@ -236,7 +454,6 @@
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            /* Adjusted minmax for better fit */
             gap: 1.5rem;
             max-width: 1400px;
             margin: 0 auto;
@@ -395,105 +612,111 @@
             border: 1px solid #22c55e;
         }
 
-        /* Animations */
-        @keyframes spin {
-            to {
-                transform: rotate(1turn);
-            }
+        /* --- MODERN FOOTER (From Index) --- */
+        .modern-footer {
+            margin-top: 5rem;
+            border-top: 1px solid var(--glass-border);
+            background: transparent;
+            padding: 4rem 2rem 1.5rem 2rem;
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.7;
-            }
-
-            50% {
-                opacity: 1;
-            }
+        .footer-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
         }
 
-        @keyframes popIn {
-            to {
-                transform: scale(1);
-            }
+        .footer-col h3 {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
         }
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .footer-col p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        .footer-col h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 0 auto;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Inline CSS Helper for Hover Effects */
+        .social-hover:hover {
+            background: #8b5cf6 !important;
+            border-color: #8b5cf6 !important;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 900px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
             }
 
-            50% {
-                transform: translateY(-10px);
+            .footer-col a:hover {
+                transform: none;
             }
 
-            100% {
-                transform: translateY(0px);
+            div[style*="display: flex"] {
+                justify-content: center;
             }
+
+            /* Center social icons on mobile */
         }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.4;
-            z-index: -1;
-        }
-
-        .orb-1 {
-            top: -10%;
-            left: -10%;
-            width: 500px;
-            height: 500px;
-            background: var(--primary);
-            animation: float 6s infinite ease-in-out;
-        }
-
-        .orb-2 {
-            bottom: 10%;
-            right: -5%;
-            width: 400px;
-            height: 400px;
-            background: var(--accent);
-            animation: float 7s infinite ease-in-out 1s;
-        }
-
-        /* --- RESPONSIVE MEDIA QUERIES (NEW) --- */
         @media (max-width: 768px) {
             .navbar {
                 padding: 1rem 5%;
             }
 
-            .brand {
-                font-size: 1.3rem;
+            .nav-items,
+            .nav-username {
+                display: none;
             }
 
-            .brand img {
-                height: 32px;
+            .user-dropdown {
+                margin-left: 10px;
+            }
+
+            .dropdown-menu {
+                right: -10px;
+                width: 180px;
             }
 
             .pricing-header {
@@ -504,18 +727,12 @@
                 font-size: 2.2rem;
             }
 
-            .pricing-header p {
-                font-size: 1rem;
-            }
-
             .pricing-grid {
                 grid-template-columns: 1fr;
-                /* Stack cards vertically on mobile */
                 padding: 0 1.5rem 3rem 1.5rem;
-                gap: 1.5rem;
             }
 
-            /* Adjust Orbs so they don't block content on small screens */
+            /* Adjust Orbs */
             .orb-1 {
                 width: 250px;
                 height: 250px;
@@ -530,25 +747,9 @@
                 right: -15%;
             }
 
-            /* Remove transform hover effects on mobile to prevent sticky states */
             .pricing-card:hover,
             .pricing-card.featured:hover {
                 transform: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .pricing-header h1 {
-                font-size: 1.8rem;
-            }
-
-            .navbar {
-                padding: 1rem;
-            }
-
-            .btn-login {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
             }
         }
     </style>
@@ -585,8 +786,46 @@
             <img th:src="@{/images/logo.png}" alt="Logo">
             <span>QuizGenix</span>
         </a>
-        <a th:if="${isLoggedIn}" th:href="@{/dashboard}" class="btn-login">Dashboard</a>
-        <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn-login">Log In</a>
+        <div class="nav-items">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/about}">About Us</a>
+            <a th:href="@{/contact}">Contact Us</a>
+            <a th:href="@{/pricing}" style="color: var(--accent);">Pricing</a>
+        </div>
+
+        <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn-glow">Login</a>
+
+        <div th:if="${isLoggedIn}" class="user-dropdown">
+            <div class="user-trigger">
+                <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                    th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : '/user-photos/' + user.profileImage}"
+                    class="nav-avatar-img" alt="Avatar">
+
+                <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</div>
+
+                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">User</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
+                    <path d="M6 9l6 6 6-6" />
+                </svg>
+            </div>
+
+            <div class="dropdown-menu">
+                <div th:if="${user.role == 'ADMIN'}">
+                    <a th:href="@{/admin/dashboard}" class="dropdown-item"><span>📊</span> Admin Panel</a>
+                    <a th:href="@{/admin/users}" class="dropdown-item"><span>👥</span> Manage Users</a>
+                    <a th:href="@{/admin/settings}" class="dropdown-item"><span>⚙️</span> Settings</a>
+                </div>
+                <div th:unless="${user.role == 'ADMIN'}">
+                    <a th:href="@{/dashboard}" class="dropdown-item"><span>⚡</span> Dashboard</a>
+                    <a th:href="@{/my-quizzes}" class="dropdown-item"><span>📚</span> My Quizzes</a>
+                    <a th:href="@{/settings}" class="dropdown-item"><span>⚙️</span> Settings</a>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a th:href="@{/logout}" class="dropdown-item" style="color: #ef4444;"><span>🚪</span> Logout</a>
+            </div>
+        </div>
     </nav>
 
     <header class="pricing-header">
@@ -605,7 +844,6 @@
     </header>
 
     <div class="pricing-grid">
-
         <div class="pricing-card">
             <div class="plan-name">Basic</div>
             <div class="plan-price">₹0 <span>/forever</span></div>
@@ -613,31 +851,22 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    <strong>10 Quizzes</strong> / Month
-                </li>
+                    </svg> <strong>10 Quizzes</strong> / Month</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Standard (Easy/Medium)
-                </li>
+                    </svg> Standard (Easy/Medium)</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    7-Day History Access
-                </li>
+                    </svg> 7-Day History Access</li>
                 <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    Detailed Explanations
-                </li>
+                    </svg> Detailed Explanations</li>
             </ul>
             <button class="btn-plan" onclick="handleFreePlan()"
                 th:classappend="${isLoggedIn and activePlanRank == 0} ? 'active-plan' : ''"
-                th:text="${isLoggedIn and activePlanRank == 0 ? 'Current Plan' : (isLoggedIn ? 'Included' : 'Get Basic')}">
-                Get Basic
-            </button>
+                th:text="${isLoggedIn and activePlanRank == 0 ? 'Current Plan' : (isLoggedIn ? 'Included' : 'Get Basic')}">Get
+                Basic</button>
         </div>
 
         <div class="pricing-card">
@@ -647,33 +876,23 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    <strong>Unlimited</strong> Quizzes
-                </li>
+                    </svg> <strong>Unlimited</strong> Quizzes</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Unlock <strong>Hard</strong> Mode
-                </li>
+                    </svg> Unlock <strong>Hard</strong> Mode</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Detailed Answer Logic
-                </li>
+                    </svg> Detailed Answer Logic</li>
                 <li class="disabled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    PDF Downloads
-                </li>
+                    </svg> PDF Downloads</li>
             </ul>
-
             <button class="btn-plan" th:onclick="'startPayment(' + ${costMonthly} + ', \'Monthly Plan\')'"
                 th:classappend="${isLoggedIn and activePlanRank == 1} ? 'active-plan' : ''"
                 th:disabled="${isLoggedIn and activePlanRank > 1}"
-                th:text="${isLoggedIn and activePlanRank == 1 ? 'Current Plan' : (isLoggedIn and activePlanRank > 1 ? 'Included' : 'Upgrade @ ₹' + costMonthly)}">
-                Upgrade Now
-            </button>
+                th:text="${isLoggedIn and activePlanRank == 1 ? 'Current Plan' : (isLoggedIn and activePlanRank > 1 ? 'Included' : 'Upgrade @ ₹' + costMonthly)}">Upgrade
+                Now</button>
         </div>
 
         <div class="pricing-card">
@@ -684,32 +903,22 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Everything in Pro
-                </li>
+                    </svg> Everything in Pro</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Unlock <strong>Expert</strong> Mode
-                </li>
+                    </svg> Unlock <strong>Expert</strong> Mode</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Unlimited History
-                </li>
+                    </svg> Unlimited History</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Download Quizzes as PDF
-                </li>
+                    </svg> Download Quizzes as PDF</li>
             </ul>
-
             <button class="btn-plan" th:onclick="'startPayment(' + ${cost6Month} + ', \'6-Month Plan\')'"
                 th:classappend="${isLoggedIn and activePlanRank == 2} ? 'active-plan' : ''"
                 th:disabled="${isLoggedIn and activePlanRank > 2}"
-                th:text="${isLoggedIn and activePlanRank == 2 ? 'Current Plan' : (isLoggedIn and activePlanRank > 2 ? 'Included' : 'Upgrade @ ₹' + cost6Month)}">
-                Upgrade Now
-            </button>
+                th:text="${isLoggedIn and activePlanRank == 2 ? 'Current Plan' : (isLoggedIn and activePlanRank > 2 ? 'Included' : 'Upgrade @ ₹' + cost6Month)}">Upgrade
+                Now</button>
         </div>
 
         <div class="pricing-card featured">
@@ -720,35 +929,97 @@
             <ul class="features-list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    <strong>Adaptive AI</strong> Difficulty
-                </li>
+                    </svg> <strong>Adaptive AI</strong> Difficulty</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    All Plus Features
-                </li>
+                    </svg> All Plus Features</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Completion Certificates
-                </li>
+                    </svg> Completion Certificates</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Priority Server Access
-                </li>
+                    </svg> Priority Server Access</li>
             </ul>
-
             <button class="btn-plan btn-featured" th:onclick="'startPayment(' + ${costYearly} + ', \'Yearly Plan\')'"
                 th:classappend="${isLoggedIn and activePlanRank == 3} ? 'active-plan' : ''"
                 th:disabled="${isLoggedIn and activePlanRank > 3}"
-                th:text="${isLoggedIn and activePlanRank == 3 ? 'Current Plan' : 'Upgrade @ ₹' + costYearly}">
-                Upgrade Now
-            </button>
+                th:text="${isLoggedIn and activePlanRank == 3 ? 'Current Plan' : 'Upgrade @ ₹' + costYearly}">Upgrade
+                Now</button>
         </div>
     </div>
+
+    <footer class="modern-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>QuizGenix</h3>
+                <p>Empowering learners with AI-driven assessments. Join the future of education today.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a th:href="@{/about}">About Us</a>
+                <a th:href="@{/pricing}">Pricing</a>
+                <a href="#">Features</a>
+                <a href="#">Leaderboard</a>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <a href="#" class="social-hover"
+                        style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: grid; place-items: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-github" style="margin: 0; padding: 0; font-size: 1.1rem; line-height: 0;"></i>
+                    </a>
+                    <a href="#" class="social-hover"
+                        style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: grid; place-items: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-linkedin-in"
+                            style="margin: 0; padding: 0; font-size: 1.1rem; line-height: 0;"></i>
+                    </a>
+                    <a href="#" class="social-hover"
+                        style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: grid; place-items: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-twitter" style="margin: 0; padding: 0; font-size: 1.1rem; line-height: 0;"></i>
+                    </a>
+                    <a href="#" class="social-hover"
+                        style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); display: grid; place-items: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-instagram"
+                            style="margin: 0; padding: 0; font-size: 1.1rem; line-height: 0;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Next Gen Learning.</p>
+        </div>
+    </footer>
+
     <script th:inline="javascript">
+        // --- 1. DROPDOWN TOGGLE SCRIPT (From Index) ---
+        document.addEventListener('DOMContentLoaded', function () {
+            const trigger = document.querySelector('.user-trigger');
+            const menu = document.querySelector('.dropdown-menu');
+            if (trigger && menu) {
+                trigger.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (menu.style.visibility === 'visible') {
+                        menu.style.opacity = '0'; menu.style.visibility = 'hidden'; menu.style.transform = 'translateY(-10px)';
+                    } else {
+                        menu.style.opacity = '1'; menu.style.visibility = 'visible'; menu.style.transform = 'translateY(0)';
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (!trigger.contains(e.target)) {
+                        menu.style.opacity = '0'; menu.style.visibility = 'hidden'; menu.style.transform = 'translateY(-10px)';
+                    }
+                });
+            }
+        });
+
+        // --- 2. EXISTING PAYMENT SCRIPTS ---
         const loginStatusField = document.getElementById('userLoginStatus');
         const isLoggedIn = loginStatusField && loginStatusField.value === 'true';
 
@@ -761,11 +1032,8 @@
         });
 
         function handleFreePlan() {
-            if (!isLoggedIn) {
-                window.location.href = "/login";
-            } else {
-                window.location.href = "/dashboard";
-            }
+            if (!isLoggedIn) { window.location.href = "/login"; }
+            else { window.location.href = "/dashboard"; }
         }
 
         function redirectToDashboard() {
@@ -777,10 +1045,7 @@
                 window.location.href = "/login";
                 return;
             }
-
             document.getElementById('global-loader').style.display = 'flex';
-
-            // Send exact calculation from PageController to PaymentController
             $.ajax({
                 url: '/create-order',
                 data: JSON.stringify({ amount: amount, info: planName }),
@@ -789,12 +1054,10 @@
                 dataType: 'json',
                 success: function (response) {
                     document.getElementById('global-loader').style.display = 'none';
-
                     if (response.amount === 0 || response.status === 'free_upgrade') {
                         updatePaymentOnServer("free_" + Date.now(), "free_" + Date.now(), "paid", 0, planName);
                         return;
                     }
-
                     var options = {
                         "key": "rzp_test_RogDac2hXMEr6f",
                         "amount": response.amount,

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/base :: layout(~{::section}, 'Contact Messages')}">
+
+<head></head>
+
+<body>
+
+    <section>
+        <div id="global-loader" class="loader-overlay" style="z-index: 20000; display: none;">
+            <div class="spinner"></div>
+            <div class="loading-text">PROCESSING...</div>
+        </div>
+
+        <h1>User Messages</h1>
+        <p class="welcome-text">Manage inquiries, respond to users, and clean up logs.</p>
+
+        <div id="successAlert" th:if="${successMessage}"
+            style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #22c55e; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <i class="fas fa-check-circle" style="margin-right: 8px; font-size: 1.1rem;"></i>
+                <span th:text="${successMessage}" style="font-weight: 500;">Success</span>
+            </div>
+            <button onclick="this.parentElement.style.display='none'"
+                style="background: none; border: none; color: #22c55e; cursor: pointer; font-size: 1.2rem;">&times;</button>
+        </div>
+
+        <div id="errorAlert" th:if="${errorMessage}"
+            style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <i class="fas fa-exclamation-circle" style="margin-right: 8px; font-size: 1.1rem;"></i>
+                <span th:text="${errorMessage}" style="font-weight: 500;">Error</span>
+            </div>
+            <button onclick="this.parentElement.style.display='none'"
+                style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem;">&times;</button>
+        </div>
+
+        <div class="filter-bar">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search name or email..."
+                    style="color:white;">
+            </div>
+
+            <select id="filterSelect" class="filter-select" onchange="filterTable()">
+                <option value="all">All Messages</option>
+                <option value="pending">Pending</option>
+                <option value="responded">Responded</option>
+            </select>
+
+            <div style="margin-left: auto; color: #94a3b8; font-size: 0.9rem;">
+                Showing: <span id="visibleCount" style="color: white; font-weight: bold;"
+                    th:text="${#lists.size(messages)}">0</span>
+                / <span th:text="${totalItems}">0</span>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="contactsTable">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>User</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="msg : ${messages}" class="message-row">
+                        <td class="status-cell" th:data-status="${msg.responded ? 'responded' : 'pending'}">
+                            <span th:if="${msg.responded}" class="badge bg-paid">
+                                <i class="fas fa-check" style="font-size:0.7rem; margin-right:4px;"></i> Responded
+                            </span>
+                            <span th:unless="${msg.responded}" class="badge bg-pending">
+                                <i class="fas fa-clock" style="font-size:0.7rem; margin-right:4px;"></i> Pending
+                            </span>
+                        </td>
+
+                        <td class="user-data">
+                            <div class="user-cell">
+                                <div class="avatar-sm" th:text="${#strings.substring(msg.fullName,0,1).toUpperCase()}">A
+                                </div>
+                                <div class="user-info">
+                                    <div th:text="${#strings.capitalizeWords(msg.fullName)}" class="searchable-text">
+                                        Name</div>
+                                    <span class="user-email searchable-text"
+                                        th:text="${msg.email}">email@example.com</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td style="max-width: 350px;">
+                            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e2e8f0; font-size: 0.95rem;"
+                                th:text="${#strings.capitalize(msg.message)}" title="${msg.message}">
+                                Message content...
+                            </div>
+                            <div th:if="${msg.responded}"
+                                style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px; border-left: 2px solid #22c55e; padding-left: 8px;">
+                                <strong>You:</strong> <span
+                                    th:text="${#strings.abbreviate(msg.responseContent, 50)}">Reply content...</span>
+                            </div>
+                        </td>
+
+                        <td th:text="${#temporals.format(msg.submittedAt, 'dd MMM yyyy, hh:mm a')}">01 Jan, 02:30 PM
+                        </td>
+
+                        <td>
+                            <div class="action-icons">
+                                <button th:unless="${msg.responded}" class="icon-btn" title="Reply"
+                                    th:data-id="${msg.id}" th:data-email="${msg.email}"
+                                    onclick="openReplyModal(this.getAttribute('data-id'), this.getAttribute('data-email'))">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #38bdf8;">
+                                        <path
+                                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                        </path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                </button>
+
+                                <button th:if="${msg.responded}" class="icon-btn" style="cursor: default; opacity: 0.3;"
+                                    title="Already Responded">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </button>
+
+                                <button class="icon-btn block" title="Delete" type="button"
+                                    th:onclick="'confirmDelete(' + ${msg.id} + ')'">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        style="color: #ef4444;">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(messages)}">
+                        <td colspan="5" style="text-align: center; padding: 4rem; color: #94a3b8;">
+                            <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;">📭</div>
+                            No messages found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-controls" th:if="${totalPages > 1}">
+            <span class="page-info">Page <span th:text="${currentPage + 1}">1</span> of <span
+                    th:text="${totalPages}">10</span></span>
+            <div class="pagination-btns">
+                <a th:if="${currentPage > 0}" th:href="@{/admin/contacts(page=${currentPage - 1})}"
+                    class="page-btn">Previous</a>
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/admin/contacts(page=${currentPage + 1})}"
+                    class="page-btn">Next</a>
+            </div>
+        </div>
+
+        <div id="replyModal" class="modal-overlay">
+            <div class="modal-box" style="text-align: left; max-width: 500px;">
+                <div class="modal-icon" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">
+                    <i class="fas fa-paper-plane" style="font-size: 1.5rem;"></i>
+                </div>
+                <h3 class="modal-title" style="text-align: center;">Send Reply</h3>
+                <p class="modal-message" style="text-align: center;">
+                    To: <span id="replyEmail" style="color: white; font-weight: bold;"></span>
+                </p>
+                <form th:action="@{/admin/contacts/reply}" method="post" onsubmit="showLoader()">
+                    <input type="hidden" id="msgIdInput" name="id">
+                    <div style="margin-bottom: 1rem;">
+                        <textarea name="replyMessage" class="form-control" rows="6"
+                            placeholder="Type your response here..."
+                            style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #334155; color: white; padding: 12px; border-radius: 8px; font-family: inherit; resize: vertical;"
+                            required></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="modal-btn btn-cancel" onclick="closeReplyModal()">Cancel</button>
+                        <button type="submit" class="modal-btn btn-confirm"
+                            style="background: #38bdf8; width: 150px;">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="confirmModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem;"></i>
+                </div>
+                <h3 class="modal-title">Delete Message?</h3>
+                <p class="modal-message">This action cannot be undone. Are you sure you want to proceed?</p>
+                <div class="modal-actions">
+                    <button class="modal-btn btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+                    <button class="modal-btn btn-confirm" style="background: #ef4444;"
+                        onclick="proceedDelete()">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // --- VARIABLES ---
+            let deleteUrl = "";
+
+            // --- LOADER ---
+            function showLoader() {
+                const loader = document.getElementById('global-loader');
+                loader.style.display = 'flex';
+                loader.style.opacity = '1';
+                loader.style.pointerEvents = 'all';
+            }
+
+            // --- FILTERING ---
+            function filterTable() {
+                let input = document.getElementById("searchInput");
+                let filterText = input.value.toUpperCase();
+                let statusSelect = document.getElementById("filterSelect");
+                let filterStatus = statusSelect.value.toLowerCase();
+                let table = document.getElementById("contactsTable");
+                let tr = table.getElementsByTagName("tr");
+                let visibleCount = 0;
+
+                for (let i = 1; i < tr.length; i++) {
+                    let row = tr[i];
+
+                    let statusCell = row.querySelector(".status-cell");
+                    let rowStatus = statusCell ? statusCell.getAttribute("data-status") : "";
+                    let statusMatch = (filterStatus === 'all') || (rowStatus === filterStatus);
+
+                    let userCol = row.querySelector(".user-data");
+                    let textMatch = true;
+                    if (userCol) {
+                        let txtValue = userCol.textContent || userCol.innerText;
+                        textMatch = txtValue.toUpperCase().indexOf(filterText) > -1;
+                    }
+
+                    if (statusMatch && textMatch) {
+                        row.style.display = "";
+                        visibleCount++;
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+                document.getElementById('visibleCount').innerText = visibleCount;
+            }
+
+            // --- DELETE LOGIC (FIXED) ---
+            function confirmDelete(id) {
+                // Manually build URL to avoid parsing errors
+                deleteUrl = '/admin/contacts/delete/' + id;
+                console.log("Delete Requested for ID:", id); // Check console if needed
+                document.getElementById('confirmModal').classList.add('show');
+            }
+
+            function proceedDelete() {
+                if (deleteUrl) {
+                    document.getElementById('confirmModal').classList.remove('show');
+                    showLoader();
+                    window.location.href = deleteUrl;
+                }
+            }
+
+            function closeConfirmModal() {
+                document.getElementById('confirmModal').classList.remove('show');
+                deleteUrl = "";
+            }
+
+            // --- REPLY LOGIC ---
+            function openReplyModal(id, email) {
+                document.getElementById('msgIdInput').value = id;
+                document.getElementById('replyEmail').innerText = email;
+                document.getElementById('replyModal').classList.add('show');
+            }
+
+            function closeReplyModal() {
+                document.getElementById('replyModal').classList.remove('show');
+            }
+
+            // --- AUTO HIDE ALERTS ---
+            window.onload = function () {
+                const alerts = document.querySelectorAll('#successAlert, #errorAlert');
+                alerts.forEach(alert => {
+                    setTimeout(() => {
+                        alert.style.transition = "opacity 0.5s ease";
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.style.display = 'none', 500);
+                    }, 4000);
+                });
+            };
+
+            // Close on outside click
+            window.onclick = function (event) {
+                const replyModal = document.getElementById('replyModal');
+                const confirmModal = document.getElementById('confirmModal');
+                if (event.target == replyModal) closeReplyModal();
+                if (event.target == confirmModal) closeConfirmModal();
+            }
+        </script>
+
+    </section>
+
+</body>
+
+</html>

@@ -547,4 +547,40 @@ public class EmailService {
                         </html>
                         """;
     }
+
+    // --- 6. ADMIN CONTACT REPLY EMAIL (ADD THIS) ---
+    public void sendAdminReplyEmail(String toAddress, String replyContent, String originalMessage)
+            throws MessagingException, UnsupportedEncodingException {
+
+        String fromAddress = "support@quizgenix.com";
+        String senderName = "QuizGenix Support";
+        String subject = "Response to your inquiry - QuizGenix";
+
+        // 1. Format Original Message (Gray Block)
+        String formattedOriginal = "<div style='background-color:rgba(255,255,255,0.05); border-left: 4px solid #64748b; padding: 15px; color: #94a3b8; font-style: italic; margin-bottom: 20px; font-size: 14px;'>"
+                + "<strong style='color:#cbd5e1;'>You wrote:</strong><br>"
+                + originalMessage.replace("\n", "<br>")
+                + "</div>";
+
+        // 2. Format Admin Reply (Purple Block)
+        String formattedReply = "<div style='background-color:rgba(139, 92, 246, 0.1); border-left: 4px solid #8b5cf6; padding: 15px; color: #e2e8f0; margin-bottom: 20px;'>"
+                + "<strong style='color:#a78bfa;'>Our Response:</strong><br>"
+                + replyContent.replace("\n", "<br>")
+                + "</div>";
+
+        String messageBody = "Hello,<br><br>"
+                + "Thank you for contacting us. We have reviewed your query.<br><br>"
+                + formattedOriginal // Show User Message
+                + formattedReply // Show Admin Reply
+                + "If you have further questions, feel free to reply to this email.";
+
+        String content = getEmailTemplate(
+                "Support Response 💬",
+                "Response to your Message",
+                messageBody,
+                "Visit QuizGenix",
+                "http://localhost:8080");
+
+        sendEmail(toAddress, fromAddress, senderName, subject, content);
+    }
 }
