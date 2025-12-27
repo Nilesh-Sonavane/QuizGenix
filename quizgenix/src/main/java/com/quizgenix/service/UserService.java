@@ -29,10 +29,6 @@ public class UserService {
 
     private static final long EXPIRE_TOKEN_AFTER_MINUTES = 30;
 
-    // ... (Your existing methods remain the same) ...
-    // Copy content from previous file...
-    // The only change is in the save() method below:
-
     public void register(User user, String siteURL) throws Exception {
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new Exception("There is already an account registered with the email " + user.getEmail());

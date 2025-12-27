@@ -199,8 +199,8 @@
                         th:data-status="${user.enabled ? 'Active' : 'Banned'}">
                         <td>
                             <div class="user-cell">
-                                <div class="avatar-sm"
-                                    th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">U</div>
+                                <img th:src="@{${(user.profileImage == null || user.profileImage == 'profile.png') ? '/images/profile.png' : '/user-photos/' + user.profileImage}}"
+                                    class="avatar-sm" style="object-fit: cover; border-radius: 50%;" alt="User">
                                 <div class="user-info">
                                     <span
                                         th:text="${#strings.capitalizeWords(user.firstName + ' ' + user.lastName)}">Name</span>
@@ -236,6 +236,13 @@
                                         <path d="M21 3v5h-5"></path>
                                     </svg>
                                 </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: #6b7280;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                <span>No users found in the system.</span>
                             </div>
                         </td>
                     </tr>

@@ -85,7 +85,7 @@ public class InvoiceService {
         PdfPCell textCell = new PdfPCell();
         textCell.setBorder(Rectangle.NO_BORDER);
         textCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        Paragraph brandName = new Paragraph("GearNest", FONT_TITLE);
+        Paragraph brandName = new Paragraph("QuizGenix", FONT_TITLE);
         brandName.setSpacingBefore(8f);
         textCell.addElement(brandName);
         logoTable.addCell(textCell);
@@ -124,7 +124,7 @@ public class InvoiceService {
         PdfPCell fromCell = new PdfPCell();
         fromCell.setBorder(Rectangle.NO_BORDER);
         fromCell.addElement(new Paragraph("Payable To:", FONT_SUBTITLE));
-        fromCell.addElement(new Paragraph("GearNest Inc.", FONT_BODY_BOLD));
+        fromCell.addElement(new Paragraph("QuizGenix Inc.", FONT_BODY_BOLD));
         fromCell.addElement(new Paragraph("123 Tech Park, Suite 400", FONT_BODY));
         fromCell.addElement(new Paragraph("Surat, Gujarat, India - 395006", FONT_BODY));
         billTable.addCell(fromCell);
@@ -162,7 +162,7 @@ public class InvoiceService {
         else if ("Yearly Plan".equals(planDisplay))
             planDisplay = "Premium Plan (Yearly)";
 
-        addTableRow(itemTable, "GearNest Subscription - " + planDisplay, Element.ALIGN_LEFT);
+        addTableRow(itemTable, "QuizGenix Subscription - " + planDisplay, Element.ALIGN_LEFT);
         addTableRow(itemTable, "1", Element.ALIGN_CENTER);
         addTableRow(itemTable, "INR " + payment.getAmount(), Element.ALIGN_RIGHT);
         addTableRow(itemTable, "INR " + payment.getAmount(), Element.ALIGN_RIGHT);
@@ -181,12 +181,12 @@ public class InvoiceService {
 
         // 5. FOOTER
         document.add(new Paragraph("\n\n\n"));
-        Paragraph footer = new Paragraph("Thank you for choosing GearNest!", FONT_SUBTITLE);
+        Paragraph footer = new Paragraph("Thank you for choosing QuizGenix!", FONT_SUBTITLE);
         footer.setAlignment(Element.ALIGN_CENTER);
         document.add(footer);
 
         Paragraph notice = new Paragraph(
-                "If you have any questions about this invoice, please contact support@gearnest.com",
+                "If you have any questions about this invoice, please contact support@QuizGenix.com",
                 FontFactory.getFont(FontFactory.HELVETICA, 8, BaseColor.GRAY));
         notice.setAlignment(Element.ALIGN_CENTER);
         document.add(notice);

@@ -65,6 +65,7 @@ public class AuthController {
         } catch (Exception e) {
             // Handle "Email already exists" or other service errors
             model.addAttribute("error", e.getMessage());
+            System.out.println("################" + e);
             return "register";
         }
     }

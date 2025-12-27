@@ -421,7 +421,7 @@ public class EmailService {
                     "This action was taken due to a violation of our policies or security concerns.<br><br>" +
                     "If you believe this is a mistake, please contact our support team immediately.";
             buttonText = "Contact Support";
-            linkUrl = "mailto:support@quizgenix.com";
+            linkUrl = "http://localhost:8080/contact";
         }
 
         String content = getEmailTemplate(headerTitle, "Hello, " + firstName, messageBody, buttonText, linkUrl);

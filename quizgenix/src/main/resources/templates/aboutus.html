@@ -626,10 +626,10 @@
 
             <div class="footer-col">
                 <h4>Product</h4>
+                <a th:href="@{/}">Home</a>
                 <a th:href="@{/about}">About Us</a>
+                <a th:href="@{/contact}">Contact Us</a>
                 <a th:href="@{/pricing}">Pricing</a>
-                <a href="#">Features</a>
-                <a href="#">Leaderboard</a>
             </div>
 
             <div class="footer-col">
@@ -672,7 +672,9 @@
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Next Gen Learning.</p>
+            <p>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')} ">2025</span>
+                QuizGenix. Next Gen
+                Learning.</p>
         </div>
     </footer>
 
