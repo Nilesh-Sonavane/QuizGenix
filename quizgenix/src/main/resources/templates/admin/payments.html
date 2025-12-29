@@ -74,7 +74,7 @@
                             th:text="'#' + ${(payment.paymentId != null ? payment.paymentId : 'N/A')}"></td>
                         <td>
                             <div class="user-cell" th:if="${payment.user != null}">
-                                <img th:src="@{${(payment.user.profileImage == null || payment.user.profileImage == 'profile.png') ? '/images/profile.png' : '/user-photos/' + payment.user.profileImage}}"
+                                <img th:src="@{${(payment.user.profileImage == null || payment.user.profileImage == 'profile.png') ? '/images/profile.png' : payment.user.profileImage}}"
                                     class="avatar-sm" style="object-fit: cover; border-radius: 50%;" alt="User">
                                 <div class="user-info"><span
                                         th:text="${#strings.capitalizeWords(payment.user.firstName + ' ' + payment.user.lastName)}"></span><span

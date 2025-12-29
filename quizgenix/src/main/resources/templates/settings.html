@@ -214,7 +214,7 @@
 
                     <div class="profile-section">
                         <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                            th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : '/user-photos/' + user.profileImage}"
+                            th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' :  + user.profileImage}"
                             class="big-avatar" style="object-fit: cover;" id="avatarPreview" alt="Profile Photo">
 
                         <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"

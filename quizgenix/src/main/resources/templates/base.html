@@ -57,7 +57,7 @@
                 <div class="user-details">
 
                     <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                        th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : '/user-photos/' + user.profileImage}"
+                        th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : user.profileImage}"
                         class="user-avatar-img" alt="Profile">
 
                     <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"

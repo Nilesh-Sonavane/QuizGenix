@@ -534,7 +534,7 @@
         <div th:if="${isLoggedIn}" class="user-dropdown">
             <div class="user-trigger">
                 <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                    th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : '/user-photos/' + user.profileImage}"
+                    th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : user.profileImage}"
                     class="nav-avatar-img" alt="Avatar">
 
                 <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
