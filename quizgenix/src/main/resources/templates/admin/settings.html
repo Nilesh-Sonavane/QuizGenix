@@ -206,7 +206,7 @@
                     <div class="profile-header">
                         <img id="profilePreview" th:src="@{${(user.profileImage == null || user.profileImage == 'profile.png') 
                      ? '/images/profile.png' 
-                     : + user.profileImage}}" class="big-avatar" alt="Profile"
+                     : user.profileImage}}" class="big-avatar" alt="Profile"
                             style="object-fit: cover; border-radius: 50%;">
 
                         <div>

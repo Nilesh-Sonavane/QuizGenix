@@ -5,7 +5,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository; // ✅ Import this
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.quizgenix.service.CustomUserDetailsService;
 
@@ -22,8 +25,12 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                                // 1. PRICING FEATURE: Disable CSRF for Payment Endpoints
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/create-order", "/update-payment"))
+                                // 1. CSRF CONFIGURATION (Cookie-Based Fix)
+                                .csrf(csrf -> csrf
+                                                // This prevents the "Cannot create session" error by using cookies
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .ignoringRequestMatchers("/create-order", "/update-payment",
+                                                                "/webhook/**"))
 
                                 .authorizeHttpRequests((requests) -> requests
                                                 // 2. Static Resources
@@ -52,21 +59,25 @@ public class SecurityConfig {
 
                                 .formLogin((form) -> form
                                                 .loginPage("/login")
-                                                // 5. Use Custom Handler to check Plan Expiry
+                                                .loginProcessingUrl("/login")
                                                 .successHandler(successHandler)
+                                                .failureUrl("/login?error=true")
                                                 .permitAll())
 
-                                .logout((logout) -> logout
-                                                // Your original logic preserved
-                                                .logoutRequestMatcher(
-                                                                request -> request.getRequestURI().endsWith("/logout"))
+                                .logout(logout -> logout
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                                 .logoutSuccessUrl("/login?logout")
+                                                .invalidateHttpSession(true)
+                                                .clearAuthentication(true)
+                                                .deleteCookies("JSESSIONID", "XSRF-TOKEN") // ✅ Clean up both cookies
                                                 .permitAll())
+
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                                                .invalidSessionUrl("/login?expired"))
 
                                 .userDetailsService(userDetailsService);
 
                 return http.build();
         }
-
-        // REMOVED: passwordEncoder() bean is now in AppConfig.java
 }

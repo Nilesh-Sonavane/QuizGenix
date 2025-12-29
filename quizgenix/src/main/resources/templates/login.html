@@ -8,7 +8,6 @@
 
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -30,8 +29,16 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        /* 🟢 FIX: Apply overflow hidden to HTML to stop horizontal scroll */
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
-            height: 100vh;
+            min-height: 100vh;
+            width: 100%;
+            /* Ensure body takes full width */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -39,8 +46,11 @@
             color: var(--text-main);
             background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
             background-size: 40px 40px;
-            overflow: hidden;
+
+            /* 🟢 FIX: Ensure body cuts off anything sticking out */
+            overflow-x: hidden;
             position: relative;
+            padding: 20px;
         }
 
         /* --- ORB ANIMATION --- */
@@ -61,23 +71,28 @@
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(100px);
+            filter: blur(80px);
+            /* Reduced blur slightly for performance */
             opacity: 0.4;
             z-index: -1;
             animation: pulse 6s infinite ease-in-out;
+            pointer-events: none;
+            /* Prevents clicking/touching the background */
         }
 
         .orb-1 {
-            top: -100px;
-            left: -100px;
+            top: -50px;
+            /* Moved closer inside */
+            left: -50px;
             width: 500px;
             height: 500px;
             background: var(--primary);
         }
 
         .orb-2 {
-            bottom: -100px;
-            right: -100px;
+            bottom: -50px;
+            /* Moved closer inside */
+            right: -50px;
             width: 400px;
             height: 400px;
             background: var(--accent);
@@ -108,6 +123,8 @@
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            z-index: 10;
         }
 
         .brand-logo {
@@ -120,17 +137,17 @@
             transform: scale(1.1);
         }
 
-        /* Added hover effect for logo */
-
         h2 {
             margin-bottom: 0.5rem;
             font-size: 1.8rem;
+            font-weight: 700;
         }
 
         p.subtitle {
             color: var(--text-muted);
             margin-bottom: 2rem;
             font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         /* --- FORM ELEMENTS --- */
@@ -200,7 +217,6 @@
             text-decoration: underline;
         }
 
-        /* New Home Link Style */
         .home-link {
             display: inline-flex;
             align-items: center;
@@ -220,12 +236,13 @@
 
         /* --- ALERTS --- */
         .alert {
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-size: 0.9rem;
             font-weight: 500;
             text-align: center;
+            line-height: 1.4;
         }
 
         .alert-danger {
@@ -244,6 +261,72 @@
             color: #38bdf8;
             background: rgba(56, 189, 248, 0.1);
             border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* --- LOADER --- */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 14, 20, 0.9);
+            z-index: 9999;
+            display: none;
+            /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-weight: 600;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            /* Adjust Orbs to prevent mobile overflow if html hidden fails */
+            .orb-1 {
+                width: 300px;
+                height: 300px;
+                top: -50px;
+                left: -50px;
+            }
+
+            .orb-2 {
+                width: 250px;
+                height: 250px;
+                bottom: -50px;
+                right: -50px;
+            }
         }
     </style>
 </head>
@@ -270,16 +353,12 @@
         <div th:if="${param.error}" class="alert alert-danger">Invalid email or password.</div>
         <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
         <div th:if="${param.deleted}" class="alert alert-success">Your account has been deleted successfully.</div>
-
-
         <div th:if="${param.verify_email}" class="alert alert-info">Registration successful! Please check your email to
             verify your account.</div>
         <div th:if="${param.verified}" class="alert alert-success">Account verified! You can now sign in.</div>
         <div th:if="${param.verify_error}" class="alert alert-danger">Verification failed. The code may be invalid or
             expired.</div>
         <div th:if="${param.resetSuccess}" class="alert alert-success">Password reset successful! Please login.</div>
-
-
 
         <form th:action="@{/login}" method="POST" id="loginForm">
             <div class="input-group">
@@ -290,9 +369,10 @@
                 <label>Password</label>
                 <input type="password" name="password" placeholder="••••••••" required>
 
-                <div style="text-align: right; margin-top: 5px;">
+                <div style="text-align: right; margin-top: 8px;">
                     <a th:href="@{/forgot-password}"
-                        style="font-size: 0.85rem; color: #a855f7; text-decoration: none;">Forgot Password?</a>
+                        style="font-size: 0.85rem; color: #a855f7; text-decoration: none; transition: 0.2s;">Forgot
+                        Password?</a>
                 </div>
             </div>
 

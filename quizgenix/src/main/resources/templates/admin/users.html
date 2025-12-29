@@ -199,7 +199,7 @@
                         th:data-status="${user.enabled ? 'Active' : 'Banned'}">
                         <td>
                             <div class="user-cell">
-                                <img th:src="@{${(user.profileImage == null || user.profileImage == 'profile.png') ? '/images/profile.png' : '/user-photos/' + user.profileImage}}"
+                                <img th:src="@{${(user.profileImage == null || user.profileImage == 'profile.png') ? '/images/profile.png' :user.profileImage}}"
                                     class="avatar-sm" style="object-fit: cover; border-radius: 50%;" alt="User">
                                 <div class="user-info">
                                     <span

@@ -29,6 +29,11 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
@@ -38,6 +43,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* --- ANIMATIONS --- */
@@ -83,6 +89,7 @@
             z-index: -1;
             opacity: 0.4;
             animation: fadeIn 1.5s ease-out;
+            pointer-events: none;
         }
 
         .orb-1 {
@@ -133,6 +140,11 @@
             letter-spacing: 0.5px;
         }
 
+        .nav-items {
+            display: flex;
+            align-items: center;
+        }
+
         .nav-items a {
             color: var(--text-muted);
             margin-left: 2rem;
@@ -156,6 +168,7 @@
             text-decoration: none;
             box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
             transition: transform 0.2s;
+            white-space: nowrap;
         }
 
         .btn-glow:hover {
@@ -278,6 +291,7 @@
         .about-intro h1 {
             font-size: 3rem;
             margin-bottom: 1.5rem;
+            line-height: 1.2;
         }
 
         .about-intro h1 span {
@@ -464,12 +478,18 @@
             font-size: 0.9rem;
         }
 
-        /* Hover effect helper for inline elements */
         .social-hover:hover {
             background: #8b5cf6 !important;
             border-color: #8b5cf6 !important;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media(max-width: 1024px) {
+            .navbar {
+                padding: 1.5rem 4%;
+            }
         }
 
         @media(max-width: 900px) {
@@ -483,25 +503,61 @@
                 transform: none;
             }
 
-            div[style*="display: flex"] {
+            /* Center social icons on mobile */
+            .footer-col div[style*="display: flex"] {
                 justify-content: center;
             }
         }
 
         @media(max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap;
+                /* Allow wrapping */
+                padding: 1rem 1.5rem;
+            }
 
-            .nav-items,
+            .nav-items {
+                display: none;
+                /* Hide nav items on mobile */
+            }
+
+            .about-intro h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .dev-card {
+                padding: 2rem 1.5rem;
+            }
+
             .nav-username {
                 display: none;
             }
 
             .user-dropdown {
-                margin-left: 10px;
+                margin-left: auto;
             }
 
             .dropdown-menu {
                 right: -10px;
                 width: 180px;
+            }
+
+            .orb-1 {
+                width: 300px;
+                height: 300px;
+                top: -50px;
+                left: -50px;
+            }
+
+            .orb-2 {
+                width: 250px;
+                height: 250px;
+                bottom: -50px;
+                right: -50px;
             }
         }
     </style>
@@ -517,6 +573,7 @@
             <img th:src="@{/images/logo.png}" alt="Icon">
             <span>QuizGenix</span>
         </a>
+
         <div class="nav-items">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/about}" style="color: var(--accent);">About Us</a>
@@ -524,37 +581,40 @@
             <a th:href="@{/pricing}">Pricing</a>
         </div>
 
-        <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn-glow">Login</a>
+        <div style="display: flex; align-items: center; margin-left: auto;">
+            <a th:unless="${isLoggedIn}" th:href="@{/login}" class="btn-glow">Login</a>
 
-        <div th:if="${isLoggedIn}" class="user-dropdown">
-            <div class="user-trigger">
-                <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                    th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : user.profileImage}"
-                    class="nav-avatar-img" alt="Avatar">
+            <div th:if="${isLoggedIn}" class="user-dropdown">
+                <div class="user-trigger">
+                    <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                        th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : user.profileImage}"
+                        class="nav-avatar-img" alt="Avatar">
 
-                <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                    class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</div>
+                    <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                        class="nav-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">A</div>
 
-                <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">User</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
-                    <path d="M6 9l6 6 6-6" />
-                </svg>
-            </div>
+                    <span class="nav-username" th:text="${user.firstName + ' ' + user.lastName}">User</span>
 
-            <div class="dropdown-menu">
-                <div th:if="${user.role == 'ADMIN'}">
-                    <a th:href="@{/admin/dashboard}" class="dropdown-item"><span>📊</span> Admin Panel</a>
-                    <a th:href="@{/admin/users}" class="dropdown-item"><span>👥</span> Manage Users</a>
-                    <a th:href="@{/admin/settings}" class="dropdown-item"><span>⚙️</span> Settings</a>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
                 </div>
-                <div th:unless="${user.role == 'ADMIN'}">
-                    <a th:href="@{/dashboard}" class="dropdown-item"><span>⚡</span> Dashboard</a>
-                    <a th:href="@{/my-quizzes}" class="dropdown-item"><span>📚</span> My Quizzes</a>
-                    <a th:href="@{/settings}" class="dropdown-item"><span>⚙️</span> Settings</a>
+
+                <div class="dropdown-menu">
+                    <div th:if="${user.role == 'ADMIN'}">
+                        <a th:href="@{/admin/dashboard}" class="dropdown-item"><span>📊</span> Admin Panel</a>
+                        <a th:href="@{/admin/users}" class="dropdown-item"><span>👥</span> Manage Users</a>
+                        <a th:href="@{/admin/settings}" class="dropdown-item"><span>⚙️</span> Settings</a>
+                    </div>
+                    <div th:unless="${user.role == 'ADMIN'}">
+                        <a th:href="@{/dashboard}" class="dropdown-item"><span>⚡</span> Dashboard</a>
+                        <a th:href="@{/my-quizzes}" class="dropdown-item"><span>📚</span> My Quizzes</a>
+                        <a th:href="@{/settings}" class="dropdown-item"><span>⚙️</span> Settings</a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a th:href="@{/logout}" class="dropdown-item" style="color: #ef4444;"><span>🚪</span> Logout</a>
                 </div>
-                <div class="dropdown-divider"></div>
-                <a th:href="@{/logout}" class="dropdown-item" style="color: #ef4444;"><span>🚪</span> Logout</a>
             </div>
         </div>
     </nav>
