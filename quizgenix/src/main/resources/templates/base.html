@@ -53,54 +53,53 @@
         </nav>
 
         <div class="user-profile" th:if="${user != null}">
-            <div class="user-profile" th:if="${user != null}">
-                <div class="user-details">
+            <div class="user-details">
 
-                    <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                        th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : user.profileImage}"
-                        class="user-avatar-img" alt="Profile">
+                <img th:if="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                    th:src="${user.profileImage == 'profile.png' ? '/images/profile.png' : user.profileImage}"
+                    class="user-avatar-img" alt="Profile">
 
-                    <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
-                        class="user-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">
-                    </div>
-
-                    <div class="user-info">
-                        <p style="font-weight: bold; font-size: 0.9rem; text-transform: capitalize;" class="text-cap"
-                            th:text="${user.firstName} + ' ' + ${user.lastName}">User Name</p>
-
-                        <p style="font-size: 0.8rem; color: #94a3b8;" th:switch="${user.activePlan}">
-                            <span th:case="'free'">Basic Member</span>
-                            <span th:case="'Monthly Plan'">Pro Member</span>
-                            <span th:case="'6-Month Plan'">Plus Member</span>
-                            <span th:case="'Yearly Plan'">Premium Member</span>
-                            <span th:case="*">Basic Member</span>
-                        </p>
-
-                        <div th:if="${user.activePlan != 'free' and user.planExpiryDate != null}" style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; 
-                        background: rgba(255, 255, 255, 0.05); border-radius: 4px; padding: 2px 6px;">
-                            <span
-                                style="width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 5px #22c55e;"></span>
-                            <span style="font-size: 0.7rem; color: #e2e8f0; font-weight: 500; letter-spacing: 0.5px;"
-                                th:text="${#temporals.format(user.planExpiryDate, 'dd MMM yyyy')}">
-                            </span>
-                        </div>
-                    </div>
+                <div th:unless="${user.profileImage != null and !#strings.isEmpty(user.profileImage)}"
+                    class="user-avatar" th:text="${#strings.substring(user.firstName,0,1).toUpperCase()}">
                 </div>
 
-                <a th:href="@{/logout}" class="btn-logout" title="Logout"
-                    onclick="localStorage.removeItem('nextPopupTime_v1');">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </a>
+                <div class="user-info">
+                    <p style="font-weight: bold; font-size: 0.9rem; text-transform: capitalize;" class="text-cap"
+                        th:text="${user.firstName} + ' ' + ${user.lastName}">User Name</p>
+
+                    <p style="font-size: 0.8rem; color: #94a3b8;" th:switch="${user.activePlan}">
+                        <span th:case="'free'">Basic Member</span>
+                        <span th:case="'Monthly Plan'">Pro Member</span>
+                        <span th:case="'6-Month Plan'">Plus Member</span>
+                        <span th:case="'Yearly Plan'">Premium Member</span>
+                        <span th:case="*">Basic Member</span>
+                    </p>
+
+                    <div th:if="${user.activePlan != 'free' and user.planExpiryDate != null}" style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; 
+                        background: rgba(255, 255, 255, 0.05); border-radius: 4px; padding: 2px 6px;">
+                        <span
+                            style="width: 6px; height: 6px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 5px #22c55e;"></span>
+                        <span style="font-size: 0.7rem; color: #e2e8f0; font-weight: 500; letter-spacing: 0.5px;"
+                            th:text="${#temporals.format(user.planExpiryDate, 'dd MMM yyyy')}">
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div class="user-profile" th:unless="${user != null}">
-                <a th:href="@{/login}" class="menu-item" style="justify-content: center;"><span class="menu-text">Log
-                        In</span></a>
-            </div>
+
+            <a th:href="@{/logout}" class="btn-logout" title="Logout"
+                onclick="localStorage.removeItem('nextPopupTime_v1');">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </a>
+        </div>
+        <div class="user-profile" th:unless="${user != null}">
+            <a th:href="@{/login}" class="menu-item" style="justify-content: center;"><span class="menu-text">Log
+                    In</span></a>
+        </div>
 
 
     </aside>

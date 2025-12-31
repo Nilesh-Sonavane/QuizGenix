@@ -7,7 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository; // ✅ Import this
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter; // ✅ Import this
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.quizgenix.service.CustomUserDetailsService;
@@ -25,12 +26,14 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                                // 1. CSRF CONFIGURATION (Cookie-Based Fix)
+                                // 1. CSRF CONFIGURATION
                                 .csrf(csrf -> csrf
-                                                // This prevents the "Cannot create session" error by using cookies
                                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                                                 .ignoringRequestMatchers("/create-order", "/update-payment",
                                                                 "/webhook/**"))
+
+                                // 🟢 CRITICAL FIX: Register the CsrfCookieFilter to force the cookie generation
+                                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
 
                                 .authorizeHttpRequests((requests) -> requests
                                                 // 2. Static Resources
@@ -42,19 +45,10 @@ public class SecurityConfig {
                                                                 "/settings/**")
                                                 .hasRole("USER")
                                                 // 3. Public Pages
-                                                .requestMatchers(
-                                                                "/",
-                                                                "/login",
-                                                                "/register",
-                                                                "/verify",
+                                                .requestMatchers("/", "/login", "/register", "/verify",
                                                                 "/forgot-password/**",
-                                                                "/new-password",
-                                                                "/pricing",
-                                                                "/about",
-                                                                "/contact")
+                                                                "/new-password", "/pricing", "/about", "/contact")
                                                 .permitAll()
-
-                                                // 4. Protected Pages
                                                 .anyRequest().authenticated())
 
                                 .formLogin((form) -> form
@@ -69,7 +63,7 @@ public class SecurityConfig {
                                                 .logoutSuccessUrl("/login?logout")
                                                 .invalidateHttpSession(true)
                                                 .clearAuthentication(true)
-                                                .deleteCookies("JSESSIONID", "XSRF-TOKEN") // ✅ Clean up both cookies
+                                                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                                                 .permitAll())
 
                                 .sessionManagement(session -> session

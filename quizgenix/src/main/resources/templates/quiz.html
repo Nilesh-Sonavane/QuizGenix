@@ -54,9 +54,11 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
-            z-index: 10;
+            z-index: 60;
+            /* Higher than progress bar */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
+            position: relative;
         }
 
         .header-left {
@@ -195,7 +197,6 @@
             transition: all 0.2s ease;
             display: flex;
             align-items: flex-start;
-            /* Better for multiline text */
             gap: 1rem;
             position: relative;
             overflow: hidden;
@@ -219,9 +220,7 @@
             color: var(--text-muted);
             transition: 0.2s;
             flex-shrink: 0;
-            /* Prevent shrinking on small screens */
             margin-top: 2px;
-            /* Align with text */
         }
 
         .option-item:hover .option-marker {
@@ -234,7 +233,6 @@
             color: var(--text-main);
             line-height: 1.4;
             word-break: break-word;
-            /* Handle long words */
         }
 
         .option-item.correct {
@@ -345,7 +343,6 @@
             width: 100%;
             margin-inline: auto;
             background: var(--bg-dark);
-            /* Ensure readable if overlapping */
         }
 
         .btn {
@@ -377,6 +374,18 @@
 
         .btn-primary:hover {
             background: var(--primary-hover);
+        }
+
+        /* 🟢 NEW: Mobile Submit Button (Hidden on Desktop) */
+        .btn-submit-mobile {
+            display: none;
+            background: var(--success);
+            color: #0f172a;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
         }
 
         .sidebar {
@@ -535,7 +544,6 @@
             .layout-grid {
                 grid-template-columns: 1fr;
                 grid-template-rows: 1fr auto;
-                /* Content takes space, Sidebar at bottom */
             }
 
             .sidebar {
@@ -544,8 +552,12 @@
                 padding: 1rem;
                 height: auto;
                 max-height: 30vh;
-                /* Don't cover entire screen on open */
                 width: 100%;
+            }
+
+            /* 🟢 FIX: Hide the sidebar submit button on mobile because it gets hidden by overflow */
+            .sidebar .btn-submit {
+                display: none;
             }
 
             .sidebar h3 {
@@ -557,8 +569,7 @@
                 display: flex;
                 overflow-x: auto;
                 padding-bottom: 10px;
-                margin-bottom: 10px;
-                /* Hide scrollbar */
+                margin-bottom: 0;
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
@@ -569,13 +580,7 @@
 
             .p-box {
                 flex: 0 0 45px;
-                /* Fixed width, no shrink */
                 height: 45px;
-            }
-
-            .btn-submit {
-                margin-top: 0;
-                padding: 10px;
             }
 
             .question-wrapper {
@@ -603,6 +608,21 @@
                 font-size: 1rem;
             }
 
+            /* 🟢 FIX: Force Progress Bar to be Fixed on Mobile so it doesn't disappear on scroll */
+            .progress-container {
+                position: fixed;
+                top: 60px;
+                /* Below the 60px header */
+                left: 0;
+                width: 100%;
+                z-index: 55;
+            }
+
+            /* Add padding to content so it doesn't hide behind fixed progress bar */
+            .main-content {
+                padding-top: 10px;
+            }
+
             .question-wrapper {
                 padding: 1rem;
             }
@@ -618,11 +638,17 @@
 
             .nav-footer {
                 padding: 1rem;
+                gap: 10px;
             }
 
             .btn {
                 padding: 8px 16px;
                 font-size: 0.85rem;
+            }
+
+            /* 🟢 FIX: Show the Mobile Submit Button */
+            .btn-submit-mobile {
+                display: block;
             }
 
             .modal-box {
@@ -738,7 +764,8 @@
 
             <div class="nav-footer">
                 <button class="btn btn-outline" onclick="prevQuestion()">Previous</button>
-                <button class="btn btn-primary" onclick="nextQuestion()">Next Question</button>
+                <button class="btn-submit-mobile" onclick="submitQuiz()">Submit</button>
+                <button class="btn btn-primary" onclick="nextQuestion()">Next</button>
             </div>
         </main>
 
