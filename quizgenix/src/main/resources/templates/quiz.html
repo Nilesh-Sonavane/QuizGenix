@@ -4,15 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <meta name="_csrf_parameter" th:content="${_csrf.parameterName}" />
 
     <title>Attempt Quiz | QuizGenix</title>
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
-
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         /* --- ORIGINAL THEME --- */
         :root {
@@ -39,7 +38,8 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            height: 100vh;
+            /* 🟢 FIXED: Use Dynamic Viewport Height for mobile */
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -55,10 +55,8 @@
             justify-content: space-between;
             padding: 0 2rem;
             z-index: 60;
-            /* Higher than progress bar */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
-            position: relative;
         }
 
         .header-left {
@@ -99,7 +97,6 @@
             flex: 1;
             display: grid;
             grid-template-columns: 1fr 320px;
-            grid-template-rows: 1fr;
             overflow: hidden;
         }
 
@@ -182,7 +179,7 @@
             color: white;
         }
 
-        /* --- OPTIONS --- */
+        /* Options & Styles ... (Unchanged) */
         .options-list {
             display: grid;
             gap: 1rem;
@@ -218,7 +215,6 @@
             font-weight: 600;
             font-size: 0.9rem;
             color: var(--text-muted);
-            transition: 0.2s;
             flex-shrink: 0;
             margin-top: 2px;
         }
@@ -259,7 +255,7 @@
             pointer-events: none;
         }
 
-        /* --- BLUR & LOCK --- */
+        /* Explanation Box ... (Unchanged) */
         .explanation-box {
             margin-top: 2rem;
             padding: 1.5rem;
@@ -333,7 +329,7 @@
             }
         }
 
-        /* --- FOOTER & SIDEBAR --- */
+        /* Footer & Sidebar */
         .nav-footer {
             margin-top: auto;
             padding: 1.5rem 3rem 2rem 3rem;
@@ -376,7 +372,6 @@
             background: var(--primary-hover);
         }
 
-        /* 🟢 NEW: Mobile Submit Button (Hidden on Desktop) */
         .btn-submit-mobile {
             display: none;
             background: var(--success);
@@ -461,7 +456,7 @@
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
 
-        /* --- MODAL CSS --- */
+        /* Modal ... (Unchanged) */
         .modal-overlay,
         .start-overlay {
             position: fixed;
@@ -537,13 +532,18 @@
             color: var(--danger);
         }
 
-        /* --- RESPONSIVE BREAKPOINTS --- */
-
-        /* Tablet and Mobile (Below 900px) */
+        /* --- RESPONSIVE FIXES --- */
         @media (max-width: 900px) {
             .layout-grid {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr auto;
+                /* 🟢 FIXED: Use Flexbox column for mobile layout stability */
+                display: flex;
+                flex-direction: column;
+            }
+
+            .main-content {
+                flex: 1;
+                /* Takes all available remaining space */
+                overflow-y: auto;
             }
 
             .sidebar {
@@ -551,14 +551,18 @@
                 border-top: 1px solid var(--border);
                 padding: 1rem;
                 height: auto;
-                max-height: 30vh;
                 width: 100%;
+                /* 🟢 FIXED: Ensure sidebar has specific height constraints */
+                flex-shrink: 0;
+                max-height: 35vh;
+                min-height: 150px;
             }
 
-            /* 🟢 FIX: Hide the sidebar submit button on mobile because it gets hidden by overflow */
             .sidebar .btn-submit {
                 display: none;
             }
+
+            /* Hide bottom submit, use header one */
 
             .sidebar h3 {
                 margin-bottom: 0.5rem;
@@ -592,7 +596,6 @@
             }
         }
 
-        /* Mobile Phones (Below 600px) */
         @media (max-width: 600px) {
             .quiz-header {
                 padding: 0 1rem;
@@ -608,17 +611,14 @@
                 font-size: 1rem;
             }
 
-            /* 🟢 FIX: Force Progress Bar to be Fixed on Mobile so it doesn't disappear on scroll */
             .progress-container {
                 position: fixed;
                 top: 60px;
-                /* Below the 60px header */
                 left: 0;
                 width: 100%;
                 z-index: 55;
             }
 
-            /* Add padding to content so it doesn't hide behind fixed progress bar */
             .main-content {
                 padding-top: 10px;
             }
@@ -646,7 +646,6 @@
                 font-size: 0.85rem;
             }
 
-            /* 🟢 FIX: Show the Mobile Submit Button */
             .btn-submit-mobile {
                 display: block;
             }
@@ -669,7 +668,6 @@
 </head>
 
 <body>
-
     <div id="start-overlay" class="start-overlay show">
         <div class="modal-box">
             <div class="modal-icon">🚀</div>
@@ -711,7 +709,6 @@
                 <input type="hidden" name="quizId" th:value="${quiz.id}">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <input type="hidden" name="forced_submission" id="forced_submission" value="false">
-
                 <div th:each="question, iterStat : ${quiz.questions}">
                     <input type="hidden" th:name="'answer_' + ${iterStat.index}" th:id="'input-q-' + ${iterStat.index}"
                         value="">
@@ -741,23 +738,14 @@
                 </div>
                 <div th:with="isPro=${user.activePlan != 'Free'}" th:id="'explanation-' + ${iterStat.index}"
                     class="explanation-box">
-
                     <div class="exp-title">💡 Answer Explanation</div>
-
                     <p class="exp-text" th:text="${question.explanation}"
-                        th:classappend="${!isPro} ? 'blur-effect' : ''">
-                        Explanation Text...
-                    </p>
-
+                        th:classappend="${!isPro} ? 'blur-effect' : ''">Explanation...</p>
                     <div th:if="${!isPro}" class="lock-overlay">
                         <span style="font-size: 1.5rem;">🔒</span>
-                        <div style="font-weight:600; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
-                            Detailed Explanation Locked
-                        </div>
-
-                        <span class="btn-upgrade-xs">
-                            Upgrade to Unlock
-                        </span>
+                        <div style="font-weight:600; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">Detailed
+                            Explanation Locked</div>
+                        <span class="btn-upgrade-xs">Upgrade to Unlock</span>
                     </div>
                 </div>
             </div>
@@ -929,7 +917,6 @@
             const expBox = document.getElementById('explanation-' + currentIdx);
 
             if (optionsList.classList.contains('disabled')) {
-                // If question is already answered, show the explanation
                 stopTimerVisuals(true);
                 if (expBox) expBox.style.display = 'block';
             } else {
@@ -975,10 +962,8 @@
             q.querySelector('.options-list').classList.add('disabled');
             q.querySelectorAll('.option-item[data-is-correct="true"]').forEach(o => o.classList.add('correct'));
             questionTimers[currentIdx] = 0;
-
             const expBox = document.getElementById('explanation-' + currentIdx);
             if (expBox) expBox.style.display = 'block';
-
             stopTimerVisuals(false);
         }
 
@@ -994,10 +979,7 @@
                 card.parentElement.querySelectorAll('[data-is-correct="true"]').forEach(o => o.classList.add('correct'));
             }
 
-            // 🟢 Get full text from the new .option-text div
             const selectedValue = card.querySelector('.option-text').innerText.trim();
-
-            // 🟢 UPDATE HIDDEN FORM INPUT
             const hiddenInput = document.getElementById('input-q-' + idx);
             if (hiddenInput) hiddenInput.value = selectedValue;
 
