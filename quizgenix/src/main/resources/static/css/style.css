@@ -212,7 +212,7 @@ body {
     width: var(--sidebar-width);
     background: var(--sidebar-bg);
     border-right: 1px solid var(--glass-border);
-    padding: 2rem 1.5rem;
+    padding: 2rem 0.5rem;
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(10px);
